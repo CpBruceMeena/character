@@ -25,7 +25,7 @@ export default function Home() {
               Features
             </a>
             <a
-              href="/templates"
+              href="/editor"
               className="text-sm font-medium text-text-secondary transition-colors hover:text-amber-600"
             >
               Templates

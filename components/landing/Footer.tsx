@@ -23,32 +23,24 @@ export function Footer() {
           <ul className="space-y-2">
             <li>
               <a
-                href="/templates"
-                className="text-sm text-text-secondary transition-colors hover:text-amber-600"
-              >
-                Templates
-              </a>
-            </li>
-            <li>
-              <a
                 href="/editor"
                 className="text-sm text-text-secondary transition-colors hover:text-amber-600"
               >
-                Editor
+                Templates &amp; Editor
               </a>
             </li>
             <li>
               <a
-                href="/export"
+                href="#features"
                 className="text-sm text-text-secondary transition-colors hover:text-amber-600"
               >
-                Export formats
+                Features
               </a>
             </li>
           </ul>
         </div>
 
-        {/* Meta */}
+        {/* Resources */}
         <div>
           <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
             Resources
@@ -56,26 +48,18 @@ export function Footer() {
           <ul className="space-y-2">
             <li>
               <a
-                href="/docs"
+                href="/editor"
+                className="text-sm text-text-secondary transition-colors hover:text-amber-600"
+              >
+                Get Started
+              </a>
+            </li>
+            <li>
+              <a
+                href="#features"
                 className="text-sm text-text-secondary transition-colors hover:text-amber-600"
               >
                 Documentation
-              </a>
-            </li>
-            <li>
-              <a
-                href="/changelog"
-                className="text-sm text-text-secondary transition-colors hover:text-amber-600"
-              >
-                Changelog
-              </a>
-            </li>
-            <li>
-              <a
-                href="/privacy"
-                className="text-sm text-text-secondary transition-colors hover:text-amber-600"
-              >
-                Privacy
               </a>
             </li>
           </ul>
