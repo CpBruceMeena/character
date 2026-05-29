@@ -117,8 +117,8 @@ export function EditorLayout() {
           />
           <CanvasControls />
 
-          {/* Debug: render cache inspector */}
-          <CacheDevTools />
+          {/* Debug: render cache inspector (dev-only) */}
+          {process.env.NODE_ENV !== "production" && <CacheDevTools />}
         </main>
 
         {/* ── Right Panel ── */}

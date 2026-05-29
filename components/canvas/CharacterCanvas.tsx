@@ -183,7 +183,7 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
           className="h-full w-full rounded-[16px]"
           aria-label="Character preview"
         />
-        <CacheIndicator />
+        {process.env.NODE_ENV !== "production" && <CacheIndicator />}
       </div>
     </div>
   );
