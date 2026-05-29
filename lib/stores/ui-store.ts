@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ControlSection = "identity" | "body" | "face" | "hair" | "clothing" | "accessories";
+export type ControlSection = "identity" | "body" | "face" | "hair" | "clothing" | "accessories" | "background";
 
 export interface Toast {
   id: string;

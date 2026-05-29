@@ -105,15 +105,46 @@ registerTemplate({
       </svg>`,
     },
 
-    // ── Mouth ──
+    // ════════════════════════════════════════════════════════
+    //  MOUTH EXPRESSION VARIANTS (visible when helmet is off)
+    // ════════════════════════════════════════════════════════
+
+    // ── Mouth: neutral ──
     {
-      id: "mouth",
-      name: "Mouth",
+      id: "mouth-neutral",
+      name: "Mouth (Neutral)",
       zIndex: 20,
       defaultVisible: true,
       colorZones: [],
+      condition: { expression: ["neutral"] },
       inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M52 46c2 4 14 4 16 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+    },
+
+    // ── Mouth: happy ──
+    {
+      id: "mouth-happy",
+      name: "Mouth (Happy)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["happy"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 44c4 6 20 6 24 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+    },
+
+    // ── Mouth: serious ──
+    {
+      id: "mouth-serious",
+      name: "Mouth (Serious)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["serious"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M52 48c2-2 14-2 16 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
       </svg>`,
     },
 
@@ -175,6 +206,79 @@ registerTemplate({
         <path d="M16 60l6-8h12l6 8" stroke="#4A5568" stroke-width="2" fill="none"/>
       </svg>`,
     },
+
+    // ── Pendant ──
+    {
+      id: "pendant",
+      name: "Pendant",
+      zIndex: 6,
+      defaultVisible: false,
+      colorZones: [
+        { id: "pendant-gem", name: "Gem", selector: "pendant-gem", defaultColor: "#C0392B", propertyPath: "outfitColors.accent" },
+      ],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Chain -->
+        <path d="M46 50c4 6 8 10 14 14" stroke="#C0A060" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/>
+        <path d="M74 50c-4 6-8 10-14 14" stroke="#C0A060" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/>
+        <!-- Amulet setting -->
+        <path d="M52 78l8-10 8 10-4 12h-8l-4-12z" fill="#C0A060"/>
+        <path d="M52 78l8-10 8 10" stroke="#D4A84B" stroke-width="1" fill="none"/>
+        <!-- Gem -->
+        <path d="M56 78l4-6 4 6-2 8h-4l-2-8z" data-colorzone="pendant-gem" fill="#C0392B"/>
+        <!-- Gem highlight -->
+        <path d="M58 78l2-4 2 4-1 6h-2l-1-6z" fill="#FFFFFF" opacity="0.3"/>
+      </svg>`,
+    },
+
+    // ── Pauldron variant (elite) ──
+    {
+      id: "pauldron-variant",
+      name: "Pauldrons (Elite)",
+      zIndex: 7,
+      defaultVisible: false,
+      colorZones: [
+        { id: "pauldron-metal", name: "Pauldron Metal", selector: "pauldron-metal", defaultColor: "#6B7280", propertyPath: "outfitColors.primary" },
+        { id: "pauldron-accent", name: "Pauldron Accent", selector: "pauldron-accent", defaultColor: "#C0392B", propertyPath: "outfitColors.accent" },
+      ],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left pauldron overlay -->
+        <path d="M14 56c-6 4-8 16-6 24c1 4 4 8 8 6s8-12 8-24c0-6-4-10-10-6z" data-colorzone="pauldron-metal" fill="#6B7280"/>
+        <!-- Right pauldron overlay -->
+        <path d="M106 56c6 4 8 16 6 24c-1 4-4 8-8 6s-8-12-8-24c0-6 4-10 10-6z" data-colorzone="pauldron-metal" fill="#6B7280"/>
+        <!-- Left spikes -->
+        <path d="M12 60l-6-4 4-6z" data-colorzone="pauldron-accent" fill="#C0392B"/>
+        <path d="M14 68l-8-2 2-6z" data-colorzone="pauldron-accent" fill="#C0392B"/>
+        <!-- Right spikes -->
+        <path d="M108 60l6-4-4-6z" data-colorzone="pauldron-accent" fill="#C0392B"/>
+        <path d="M106 68l8-2-2-6z" data-colorzone="pauldron-accent" fill="#C0392B"/>
+        <!-- Accent studs -->
+        <circle cx="18" cy="74" r="2.5" data-colorzone="pauldron-accent" fill="#C0392B"/>
+        <circle cx="102" cy="74" r="2.5" data-colorzone="pauldron-accent" fill="#C0392B"/>
+      </svg>`,
+    },
+
+    // ── Belt pouch ──
+    {
+      id: "belt-pouch",
+      name: "Belt Pouch",
+      zIndex: 7,
+      defaultVisible: false,
+      colorZones: [
+        { id: "pouch-leather", name: "Pouch Leather", selector: "pouch-leather", defaultColor: "#6B4226", propertyPath: "outfitColors.secondary" },
+      ],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pouch body -->
+        <path d="M72 104c-4 0 -6 10 -2 16c2 4 8 6 12 0c4-6 2-16 -2-16H72z" data-colorzone="pouch-leather" fill="#6B4226"/>
+        <!-- Pouch flap -->
+        <path d="M70 104c0 0 2-4 10-4s10 4 10 4" data-colorzone="pouch-leather" fill="#5A3520"/>
+        <!-- Gold buckle -->
+        <rect x="78" y="104" width="6" height="4" rx="1.5" fill="#D4A84B"/>
+        <!-- Decorative stitching -->
+        <circle cx="76" cy="112" r="1" fill="#8B6914" opacity="0.5"/>
+        <circle cx="80" cy="114" r="1" fill="#8B6914" opacity="0.5"/>
+        <circle cx="84" cy="112" r="1" fill="#8B6914" opacity="0.5"/>
+      </svg>`,
+    },
   ],
 
   controls: [
@@ -213,5 +317,8 @@ registerTemplate({
     // Accessories
     { id: "helmet", type: "toggle", label: "Helmet", section: "accessories", targets: ["helmet"], defaultValue: true },
     { id: "shield", type: "toggle", label: "Shield", section: "accessories", targets: ["shield"], defaultValue: true },
+    { id: "pendant", type: "toggle", label: "Pendant", section: "accessories", targets: ["pendant"], defaultValue: false },
+    { id: "pauldron-variant", type: "toggle", label: "Pauldrons (Elite)", section: "accessories", targets: ["pauldron-variant"], defaultValue: false },
+    { id: "belt-pouch", type: "toggle", label: "Belt Pouch", section: "accessories", targets: ["belt-pouch"], defaultValue: false },
   ],
 });

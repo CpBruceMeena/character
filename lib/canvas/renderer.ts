@@ -16,60 +16,12 @@
  * Background and visibility checks are always fast-path (no cache).
  */
 
-import type { TemplateDefinition, ColorZone } from "@/lib/templates/schema";
-import { resolveColor } from "@/lib/canvas/resolve-color";
+import type { TemplateDefinition } from "@/lib/templates/schema";
+import { applyColorZones, layerConditionMet } from "@/lib/canvas/render-svg";
 import {
   getCachedLayer,
   setCachedLayer,
 } from "@/lib/canvas/render-cache";
-
-/* ── SVG colour-zone application ── */
-
-/**
- * Parse an SVG string, find all `[data-colorzone]` elements, and apply
- * the corresponding colour from the character state.
- *
- * - For `<g>` elements: set the CSS `color` property (so `currentColor`
- *   strokes/fills on child elements inherit the zone colour).
- * - For all other elements: set the `fill` attribute.
- *
- * Returns the modified SVG as a string.
- */
-function applyColorZones(
-  svgString: string,
-  colorZones: ColorZone[],
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  state: Record<string, any>,
-): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(svgString, "image/svg+xml");
-
-  const elements = doc.querySelectorAll("[data-colorzone]");
-  const zoneMap = new Map(colorZones.map((z) => [z.selector, z]));
-
-  elements.forEach((el) => {
-    const zoneId = el.getAttribute("data-colorzone");
-    if (!zoneId) return;
-
-    const zone = zoneMap.get(zoneId);
-    if (!zone) return;
-
-    const color = resolveColor(
-      state as Record<string, unknown>,
-      zone.propertyPath,
-      zone.defaultColor,
-    );
-
-    if (el.tagName.toLowerCase() === "g") {
-      // Groups use CSS color so `currentColor` on child elements inherits
-      (el as SVGElement).style.setProperty("color", color);
-    } else {
-      el.setAttribute("fill", color);
-    }
-  });
-
-  return new XMLSerializer().serializeToString(doc.documentElement);
-}
 
 /* ── SVG → Off-screen canvas ── */
 
@@ -116,18 +68,29 @@ function renderSvgToCanvas(
 /* ── Layer visibility ── */
 
 /**
- * Determine whether a layer should be rendered based on the current
- * accessory toggle state. A layer is hidden when its `id` matches a
- * toggle that is explicitly `false`.
+ * Determine whether a layer should be rendered.
+ *
+ * If the layer ID exists in the accessory toggle map, the toggle value
+ * controls visibility (checked first so toggles override everything).
+ * Otherwise the layer's `defaultVisible` is used — this lets accessory
+ * layers start hidden while body/face layers start visible.
+ *
+ * If the layer has an optional `condition` (expression / eye-size match),
+ * the shared `layerConditionMet` utility checks it against the current state.
  */
 function isLayerVisible(
-  layerId: string | undefined,
+  layerId: string,
   toggles: Record<string, boolean>,
+  defaultVisible: boolean,
+  condition?: { expression?: string[]; eyeSize?: { min?: number; max?: number } },
+  state?: Record<string, unknown>,
 ): boolean {
-  if (!layerId) return true;
-  const val = toggles[layerId];
-  // Only hide if the toggle is explicitly false (undefined = not toggled = visible)
-  return val !== false;
+  if (layerId in toggles) return toggles[layerId];
+  if (!defaultVisible) return false;
+  if (condition && state) {
+    return layerConditionMet(condition, state);
+  }
+  return true;
 }
 
 /* ── Render options ── */
@@ -147,19 +110,67 @@ export interface RenderCharacterOptions {
 
 /**
  * Background types rendered behind the character.
+ * `"none"` skips drawing entirely (leaves canvas transparent).
  */
-export type BackgroundType = "checker" | "solid" | "gradient";
+export type BackgroundType = "checker" | "solid" | "gradient" | "none";
+
+/** Options for drawing the background behind a character. */
+export interface BackgroundDrawOptions {
+  type: BackgroundType;
+  /** Solid fill colour (for "solid" and secondary for "gradient") */
+  color?: string;
+  /** Secondary gradient colour (for "gradient") */
+  secondaryColor?: string;
+}
 
 /**
- * Draw a background pattern onto a canvas context.
+ * Default colours used when the character state doesn't specify custom values.
+ */
+const DEFAULT_BACKGROUNDS: Record<string, BackgroundDrawOptions> = {
+  checker: { type: "checker" as BackgroundType },
+  solid: { type: "solid" as BackgroundType, color: "#ffffff" },
+  gradient: {
+    type: "gradient" as BackgroundType,
+    color: "#fffbeb",
+    secondaryColor: "#cffafe",
+  },
+  none: { type: "none" as BackgroundType },
+};
+
+/**
+ * Resolve the effective background draw options from character state.
+ * Falls back to sensible defaults for any missing values.
+ */
+export function resolveBackgroundOptions(
+  state: Record<string, unknown>,
+  mode?: string,
+): BackgroundDrawOptions {
+  const bgMode = (mode ?? state.backgroundMode ?? "checker") as BackgroundType;
+  if (bgMode === "none") return { type: "none" };
+
+  const bg = state.background as
+    | { type?: string; color?: string; secondaryColor?: string }
+    | undefined;
+
+  const defaults = DEFAULT_BACKGROUNDS[bgMode] ?? DEFAULT_BACKGROUNDS.checker;
+
+  return {
+    type: bgMode,
+    color: bg?.color ?? defaults.color,
+    secondaryColor: bg?.secondaryColor ?? defaults.secondaryColor,
+  };
+}
+
+/**
+ * Draw a background pattern onto a canvas context using the provided options.
  */
 export function drawBackground(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
-  type: BackgroundType,
+  options: BackgroundDrawOptions,
 ): void {
-  switch (type) {
+  switch (options.type) {
     case "checker": {
       const size = 12;
       ctx.fillStyle = "#f0ede8";
@@ -175,17 +186,20 @@ export function drawBackground(
       break;
     }
     case "solid":
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = options.color ?? "#ffffff";
       ctx.fillRect(0, 0, w, h);
       break;
     case "gradient": {
       const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, "#fffbeb");
-      grad.addColorStop(1, "#cffafe");
+      grad.addColorStop(0, options.color ?? "#fffbeb");
+      grad.addColorStop(1, options.secondaryColor ?? "#cffafe");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
       break;
     }
+    case "none":
+      // Leave canvas transparent — no-op for PNG exports
+      break;
   }
 }
 
@@ -224,12 +238,21 @@ export async function renderCharacter(
   const ctx = result.getContext("2d")!;
 
   // 1. Draw background (not cached — cheap path always)
-  const bgMode = (state.backgroundMode ?? "checker") as BackgroundType;
-  drawBackground(ctx, width, height, bgMode);
+  const bgOptions = resolveBackgroundOptions(state);
+  drawBackground(ctx, width, height, bgOptions);
 
   // 2. Composite each visible layer
   for (const layer of sortedLayers) {
-    if (!isLayerVisible(layer.id, toggles)) continue;
+    if (
+      !isLayerVisible(
+        layer.id,
+        toggles,
+        layer.defaultVisible,
+        layer.condition,
+        state,
+      )
+    )
+      continue;
 
     const propertyPaths = layer.colorZones.map((z) => z.propertyPath);
     const defaultColors = layer.colorZones.map((z) => z.defaultColor);

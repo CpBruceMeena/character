@@ -3,6 +3,14 @@
 /** Category identifiers used across the app */
 export type CategoryId = "cartoon" | "fantasy" | "modern" | "historical";
 
+/** Conditions that control when a layer is visible based on character state */
+export interface LayerCondition {
+  /** Only show layer when expression matches one of these values */
+  expression?: string[];
+  /** Only show layer when eyeSize falls within this range */
+  eyeSize?: { min?: number; max?: number };
+}
+
 /** Control sections that map to editor tabs */
 export type ControlSection = "identity" | "body" | "face" | "hair" | "clothing" | "accessories";
 
@@ -55,6 +63,15 @@ export interface LayerDefinition {
   colorZones: ColorZone[];
   /** If set, this layer only renders when the parent layer is visible */
   parentLayer?: string;
+  /**
+   * Optional condition that restricts when this layer is visible.
+   * Used for expression variants (e.g. eyebrows-happy shows only when
+   * expression === "happy") and eye-size variants.
+   *
+   * When a layer has a condition, the condition must be satisfied
+   * IN ADDITION to the normal visibility checks (toggles, defaultVisible).
+   */
+  condition?: LayerCondition;
 }
 
 /* ── Control Definition ── */

@@ -7,14 +7,34 @@ import { CharacterCanvas } from "@/components/canvas/CharacterCanvas";
 import { CanvasControls } from "@/components/canvas/CanvasControls";
 import { CacheDevTools } from "@/components/debug/CacheDevTools";
 import { ControlPanel } from "./ControlPanel";
+import { ExportDialog } from "./ExportDialog";
 import { useCharacterStore } from "@/lib/stores/character-store";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { getCategories, getTemplatesForCategory } from "@/lib/templates/registry";
+import { useOnboarding } from "@/lib/utils/use-onboarding";
+import { OnboardingTooltip } from "./OnboardingTooltip";
 import type { CategoryId } from "@/lib/templates/schema";
 
 // Static imports ensure template definitions are registered at module load
 import "@/lib/templates/definitions/cartoon-base-a";
 import "@/lib/templates/definitions/fantasy-knight";
+
+function OnboardingOverlay() {
+  const { isActive, currentStep, step, totalSteps, next, dismiss, hydrated } =
+    useOnboarding();
+
+  if (!isActive || !currentStep || step === null) return null;
+
+  return (
+    <OnboardingTooltip
+      step={currentStep}
+      currentIndex={step}
+      totalSteps={totalSteps}
+      onNext={next}
+      onDismiss={dismiss}
+    />
+  );
+}
 
 export function EditorLayout() {
   const selectedCategory = useCharacterStore((s) => s.categoryId);
@@ -104,6 +124,12 @@ export function EditorLayout() {
         {/* ── Right Panel ── */}
         <ControlPanel isOpen={isControlsOpen} />
       </div>
+
+      {/* ── Export Dialog ── */}
+      <ExportDialog />
+
+      {/* ── Onboarding Tour ── */}
+      <OnboardingOverlay />
     </div>
   );
 }

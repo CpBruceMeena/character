@@ -22,7 +22,7 @@ function drawPlaceholder(
   category: string,
 ) {
   // Background
-  drawBackground(ctx, w, h, "checker");
+  drawBackground(ctx, w, h, { type: "checker" });
 
   const cx = w / 2;
   const cy = h / 2;

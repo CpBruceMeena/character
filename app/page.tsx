@@ -1,5 +1,6 @@
 import { Hero } from "@/components/landing/Hero";
 import { CategoryShowcase } from "@/components/landing/CategoryShowcase";
+import { CharacterGallery } from "@/components/landing/CharacterGallery";
 import { Features } from "@/components/landing/Features";
 import { ExportFormats } from "@/components/landing/ExportFormats";
 import { Footer } from "@/components/landing/Footer";
@@ -57,6 +58,9 @@ export default function Home() {
 
       {/* ── Category Showcase ── */}
       <CategoryShowcase />
+
+      {/* ── Character Gallery ── */}
+      <CharacterGallery />
 
       {/* ── Features ── */}
       <Features />

@@ -119,6 +119,61 @@
   }
 }
 
+/* ── Dark Mode ──────────────────────────────────────────────── */
+/* Applied when <html> has class "dark"                          */
+
+.dark {
+  --color-bg-page: #1a1614;
+  --color-bg-canvas: #2a2420;
+  --color-bg-card: #2d2723;
+  --color-border: #3d3530;
+  --color-border-hover: #4d4440;
+  --color-gray-100: #2d2d2d;
+  --color-gray-200: #3d3d3d;
+  --color-gray-300: #4d4d4d;
+  --color-gray-400: #6d6d6d;
+  --color-gray-500: #8d8d8d;
+  --color-text-tertiary: #8a8278;
+  --color-text-secondary: #bcb4ab;
+  --color-text-primary: #f0ece6;
+
+  --color-amber-50: #2a1f0f;
+  --color-amber-100: #3d2e14;
+  --color-amber-200: #5c451f;
+  --color-amber-300: #7a5d29;
+  --color-amber-400: #a67c35;
+  --color-amber-500: #d69e3c;
+  --color-amber-600: #e8b44a;
+  --color-amber-700: #f5cc6e;
+  --color-amber-800: #fade96;
+  --color-amber-900: #feefc8;
+
+  --color-coral-100: #2d1410;
+  --color-coral-200: #4a1f18;
+  --color-coral-300: #7a2e22;
+  --color-coral-400: #b04433;
+  --color-coral-500: #f85a3e;
+  --color-coral-600: #ff7a62;
+  --color-coral-700: #ffa694;
+
+  --color-teal-100: #0f2a2e;
+  --color-teal-200: #123d43;
+  --color-teal-400: #1b9eb8;
+  --color-teal-500: #22d3ee;
+  --color-teal-600: #5de0f2;
+  --color-teal-700: #8eebf6;
+  --color-teal-900: #c0f4fa;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Transition theme changes smoothly ── */
+html {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
 /* ── Body defaults ── */
 body {
   background: var(--color-bg-page);

@@ -97,6 +97,7 @@ export function CategorySidebar({
 
   return (
     <aside
+      data-onboarding-target="sidebar-categories"
       className={`flex flex-col border-r border-border bg-bg-card transition-all duration-200 ${
         isOpen ? "w-[220px] min-w-[220px]" : "w-0 min-w-0 overflow-hidden"
       }`}

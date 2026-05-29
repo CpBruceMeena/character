@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/shared/Button";
 import { IconButton } from "@/components/shared/IconButton";
+import { ThemeToggle } from "./ThemeToggle";
 import {
   useCharacterStore,
   undo,
@@ -140,8 +141,10 @@ export function TopBar({
 
         {/* Right: actions */}
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* Theme toggle */}
+          <ThemeToggle />
           {/* Desktop action buttons */}
-          <div className="hidden items-center gap-1 sm:flex">
+          <div data-onboarding-target="undo-redo" className="hidden items-center gap-1 sm:flex">
             <IconButton
               label="Undo (⌘Z)"
               onClick={undo}
@@ -201,6 +204,7 @@ export function TopBar({
 
           {/* Export CTA */}
           <Button
+            data-onboarding-target="export-btn"
             variant="coral"
             size="sm"
             className="whitespace-nowrap"

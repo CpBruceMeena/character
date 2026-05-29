@@ -60,13 +60,42 @@ registerTemplate({
       </svg>`,
     },
 
-    // ── Eyes ──
+    // ════════════════════════════════════════════════════════
+    //  EYE SIZE VARIANTS (pick one based on eyeSize slider)
+    // ════════════════════════════════════════════════════════
+
+    // ── Eyes: small ──
     {
-      id: "eyes",
-      name: "Eyes",
+      id: "eyes-small",
+      name: "Eyes (Small)",
       zIndex: 20,
       defaultVisible: true,
       colorZones: [],
+      condition: { eyeSize: { max: 40 } },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left eye white -->
+        <ellipse cx="46" cy="36" rx="5" ry="6" fill="#FFFFFF"/>
+        <!-- Left pupil -->
+        <circle cx="47" cy="36" r="3" fill="#3D2314"/>
+        <!-- Left highlight -->
+        <circle cx="45" cy="34" r="1" fill="#FFFFFF"/>
+        <!-- Right eye white -->
+        <ellipse cx="74" cy="36" rx="5" ry="6" fill="#FFFFFF"/>
+        <!-- Right pupil -->
+        <circle cx="73" cy="36" r="3" fill="#3D2314"/>
+        <!-- Right highlight -->
+        <circle cx="71" cy="34" r="1" fill="#FFFFFF"/>
+      </svg>`,
+    },
+
+    // ── Eyes: default ──
+    {
+      id: "eyes-default",
+      name: "Eyes (Default)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { eyeSize: { min: 40, max: 80 } },
       inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- Left eye white -->
         <ellipse cx="46" cy="36" rx="7" ry="8" fill="#FFFFFF"/>
@@ -83,15 +112,44 @@ registerTemplate({
       </svg>`,
     },
 
-    // ── Eyebrows ──
+    // ── Eyes: large ──
     {
-      id: "eyebrows",
-      name: "Eyebrows",
+      id: "eyes-large",
+      name: "Eyes (Large)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { eyeSize: { min: 80 } },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left eye white -->
+        <ellipse cx="46" cy="36" rx="9" ry="11" fill="#FFFFFF"/>
+        <!-- Left pupil -->
+        <circle cx="47" cy="37" r="5.5" fill="#3D2314"/>
+        <!-- Left highlight -->
+        <circle cx="44" cy="33" r="2" fill="#FFFFFF"/>
+        <!-- Right eye white -->
+        <ellipse cx="74" cy="36" rx="9" ry="11" fill="#FFFFFF"/>
+        <!-- Right pupil -->
+        <circle cx="73" cy="37" r="5.5" fill="#3D2314"/>
+        <!-- Right highlight -->
+        <circle cx="71" cy="33" r="2" fill="#FFFFFF"/>
+      </svg>`,
+    },
+
+    // ════════════════════════════════════════════════════════
+    //  EYEBROW EXPRESSION VARIANTS (pick one based on expression)
+    // ════════════════════════════════════════════════════════
+
+    // ── Eyebrows: neutral ──
+    {
+      id: "eyebrows-neutral",
+      name: "Eyebrows (Neutral)",
       zIndex: 15,
       defaultVisible: true,
       colorZones: [
         { id: "brows", name: "Eyebrows", selector: "brows", defaultColor: "#3D2314", propertyPath: "hairColor" },
       ],
+      condition: { expression: ["neutral"] },
       inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g data-colorzone="brows" color="#3D2314">
           <path d="M36 24c4-4 10-4 14-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
@@ -100,15 +158,145 @@ registerTemplate({
       </svg>`,
     },
 
-    // ── Mouth ──
+    // ── Eyebrows: happy ──
     {
-      id: "mouth",
-      name: "Mouth",
+      id: "eyebrows-happy",
+      name: "Eyebrows (Happy)",
+      zIndex: 15,
+      defaultVisible: true,
+      colorZones: [
+        { id: "brows", name: "Eyebrows", selector: "brows", defaultColor: "#3D2314", propertyPath: "hairColor" },
+      ],
+      condition: { expression: ["happy"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g data-colorzone="brows" color="#3D2314">
+          <path d="M34 18c6-6 12-4 16-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M70 16c4-6 10-6 16-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      </svg>`,
+    },
+
+    // ── Eyebrows: serious ──
+    {
+      id: "eyebrows-serious",
+      name: "Eyebrows (Serious)",
+      zIndex: 15,
+      defaultVisible: true,
+      colorZones: [
+        { id: "brows", name: "Eyebrows", selector: "brows", defaultColor: "#3D2314", propertyPath: "hairColor" },
+      ],
+      condition: { expression: ["serious"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g data-colorzone="brows" color="#3D2314">
+          <path d="M36 28c4-2 10 0 14 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M70 28c4-2 10 0 14 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      </svg>`,
+    },
+
+    // ── Eyebrows: surprised ──
+    {
+      id: "eyebrows-surprised",
+      name: "Eyebrows (Surprised)",
+      zIndex: 15,
+      defaultVisible: true,
+      colorZones: [
+        { id: "brows", name: "Eyebrows", selector: "brows", defaultColor: "#3D2314", propertyPath: "hairColor" },
+      ],
+      condition: { expression: ["surprised"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g data-colorzone="brows" color="#3D2314">
+          <path d="M34 14c6-8 12-6 16-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M70 12c4-8 10-8 16-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      </svg>`,
+    },
+
+    // ── Eyebrows: sad ──
+    {
+      id: "eyebrows-sad",
+      name: "Eyebrows (Sad)",
+      zIndex: 15,
+      defaultVisible: true,
+      colorZones: [
+        { id: "brows", name: "Eyebrows", selector: "brows", defaultColor: "#3D2314", propertyPath: "hairColor" },
+      ],
+      condition: { expression: ["sad"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g data-colorzone="brows" color="#3D2314">
+          <path d="M34 22c6-4 12 0 16 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M70 22c4-4 10 0 16 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      </svg>`,
+    },
+
+    // ════════════════════════════════════════════════════════
+    //  MOUTH EXPRESSION VARIANTS (pick one based on expression)
+    // ════════════════════════════════════════════════════════
+
+    // ── Mouth: neutral (slight smile) ──
+    {
+      id: "mouth-neutral",
+      name: "Mouth (Neutral)",
       zIndex: 20,
       defaultVisible: true,
       colorZones: [],
+      condition: { expression: ["neutral"] },
       inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M50 52c4 6 16 6 20 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+    },
+
+    // ── Mouth: happy (big smile) ──
+    {
+      id: "mouth-happy",
+      name: "Mouth (Happy)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["happy"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M44 50c6 14 26 14 32 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+    },
+
+    // ── Mouth: serious (straight line) ──
+    {
+      id: "mouth-serious",
+      name: "Mouth (Serious)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["serious"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 56c4-2 16-2 20 0" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+    },
+
+    // ── Mouth: surprised (open O) ──
+    {
+      id: "mouth-surprised",
+      name: "Mouth (Surprised)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["surprised"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="60" cy="54" rx="7" ry="9" fill="#3D2314"/>
+        <ellipse cx="60" cy="53" rx="6" ry="7" fill="#C0392B"/>
+      </svg>`,
+    },
+
+    // ── Mouth: sad (frown) ──
+    {
+      id: "mouth-sad",
+      name: "Mouth (Sad)",
+      zIndex: 20,
+      defaultVisible: true,
+      colorZones: [],
+      condition: { expression: ["sad"] },
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 56c6-4 18-4 24 2" stroke="#C0392B" stroke-width="2" stroke-linecap="round"/>
       </svg>`,
     },
 
@@ -145,6 +333,164 @@ registerTemplate({
         <!-- Pants -->
         <rect x="34" y="130" width="22" height="36" rx="4" data-colorzone="outfit-primary" fill="#4A6FA5"/>
         <rect x="64" y="130" width="22" height="36" rx="4" data-colorzone="outfit-primary" fill="#4A6FA5"/>
+      </svg>`,
+    },
+
+    // ════════════════════════════════════════════════════════
+    //  ACCESSORIES (hidden by default, toggled in ControlPanel)
+    // ════════════════════════════════════════════════════════
+
+    // ── Backpack (behind body) ──
+    {
+      id: "backpack",
+      name: "Backpack",
+      zIndex: -1,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Bag body -->
+        <rect x="8" y="64" width="20" height="34" rx="6" fill="#8B5E3C"/>
+        <!-- Flap -->
+        <rect x="8" y="60" width="20" height="10" rx="4" fill="#6B4226"/>
+        <!-- Buckle -->
+        <rect x="16" y="68" width="4" height="4" rx="1" fill="#FBBF24"/>
+        <!-- Strap visible on shoulder -->
+        <path d="M16 54c4-6 12-10 18-12" stroke="#6B4226" stroke-width="2.5" fill="none"/>
+      </svg>`,
+    },
+
+    // ── Scarf ──
+    {
+      id: "scarf",
+      name: "Scarf",
+      zIndex: 6,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Scarf wrap around neck -->
+        <path d="M38 50c0-4 4-6 10-6h24c6 0 10 2 10 6v14c0 6-4 10-10 10H48c-6 0-10-4-10-10V50z" fill="#2ECC71"/>
+        <!-- Scarf tail hanging down -->
+        <path d="M72 66c4-2 8 2 8 8v8c0 6-4 10-8 8" fill="#27AE60"/>
+      </svg>`,
+    },
+
+    // ── Necklace ──
+    {
+      id: "necklace",
+      name: "Necklace",
+      zIndex: 7,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Chain -->
+        <path d="M44 50c2 6 6 16 16 16c10 0 14-10 16-16" stroke="#FBBF24" stroke-width="1.5" fill="none"/>
+        <!-- Pendant -->
+        <circle cx="60" cy="68" r="4" fill="#FBBF24"/>
+        <!-- Gem -->
+        <circle cx="60" cy="68" r="2" fill="#C0392B"/>
+      </svg>`,
+    },
+
+    // ── Earrings ──
+    {
+      id: "earrings",
+      name: "Earrings",
+      zIndex: 16,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left earring -->
+        <circle cx="32" cy="48" r="3" fill="#FBBF24"/>
+        <circle cx="32" cy="54" r="3" fill="#FBBF24"/>
+        <!-- Right earring -->
+        <circle cx="88" cy="48" r="3" fill="#FBBF24"/>
+        <circle cx="88" cy="54" r="3" fill="#FBBF24"/>
+      </svg>`,
+    },
+
+    // ── Glasses ──
+    {
+      id: "glasses",
+      name: "Glasses",
+      zIndex: 22,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left frame -->
+        <circle cx="46" cy="36" r="9" stroke="#3D2314" stroke-width="2" fill="none"/>
+        <!-- Right frame -->
+        <circle cx="74" cy="36" r="9" stroke="#3D2314" stroke-width="2" fill="none"/>
+        <!-- Bridge -->
+        <path d="M55 34c2 2 6 2 8 0" stroke="#3D2314" stroke-width="2" fill="none"/>
+        <!-- Temple arms -->
+        <path d="M37 34c-4 0-8-2-10-4" stroke="#3D2314" stroke-width="1.5" fill="none"/>
+        <path d="M83 34c4 0 8-2 10-4" stroke="#3D2314" stroke-width="1.5" fill="none"/>
+      </svg>`,
+    },
+
+    // ── Mask ──
+    {
+      id: "mask",
+      name: "Mask",
+      zIndex: 22,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Mask shape -->
+        <path d="M42 28c6-4 12-4 18 0c6 4 8 10 8 14c0 2-2 4-4 4H38c-2 0-4-2-4-4c0-4 2-10 8-14z" fill="#3D2314" opacity="0.85"/>
+        <!-- Eye holes -->
+        <ellipse cx="48" cy="32" rx="4" ry="5" fill="#D4A574"/>
+        <ellipse cx="72" cy="32" rx="4" ry="5" fill="#D4A574"/>
+      </svg>`,
+    },
+
+    // ── Headband ──
+    {
+      id: "headband",
+      name: "Headband",
+      zIndex: 27,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Headband arc across forehead -->
+        <path d="M32 32c2-6 16-8 28-8s26 2 28 8c2 4-2 6-4 6H36c-2 0-6-2-4-6z" fill="#22D3EE"/>
+        <!-- Knot on side -->
+        <circle cx="86" cy="34" r="3" fill="#06B6D4"/>
+      </svg>`,
+    },
+
+    // ── Hat (beanie) ──
+    {
+      id: "hat",
+      name: "Hat",
+      zIndex: 30,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Beanie body -->
+        <path d="M34 42c0-14 6-24 26-24s26 10 26 24v4H34v-4z" fill="#E94560"/>
+        <!-- Ribbed brim -->
+        <rect x="32" y="44" width="56" height="6" rx="3" fill="#C0392B"/>
+        <!-- Pompom -->
+        <circle cx="60" cy="16" r="6" fill="#FFFFFF"/>
+      </svg>`,
+    },
+
+    // ── Crown ──
+    {
+      id: "crown",
+      name: "Crown",
+      zIndex: 30,
+      defaultVisible: false,
+      colorZones: [],
+      inlineSvg: `<svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Crown body with points -->
+        <path d="M36 48l-6-16l10 6l8-12l8 12l10-6l-6 16H36z" fill="#FBBF24"/>
+        <!-- Crown band -->
+        <rect x="36" y="42" width="30" height="6" rx="2" fill="#F59E0B"/>
+        <!-- Jewels -->
+        <circle cx="46" cy="36" r="2" fill="#C0392B"/>
+        <circle cx="56" cy="40" r="2" fill="#22D3EE"/>
       </svg>`,
     },
   ],
