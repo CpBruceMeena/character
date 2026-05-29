@@ -137,20 +137,28 @@ export function CategorySidebar({
           {currentCat?.label ?? "Category"} Templates
         </h3>
 
-        <div className="grid grid-cols-2 gap-2">
-          {templates.map((tmpl) => (
-            <div
-              key={tmpl.id}
-              onClick={() => onSelectTemplate(tmpl.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && onSelectTemplate(tmpl.id)}
-              aria-label={`Select ${tmpl.label} template`}
-            >
-              <TemplateThumb label={tmpl.label} selected={selectedTemplate === tmpl.id} />
-            </div>
-          ))}
-        </div>
+        {templates.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2">
+            {templates.map((tmpl) => (
+              <div
+                key={tmpl.id}
+                onClick={() => onSelectTemplate(tmpl.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && onSelectTemplate(tmpl.id)}
+                aria-label={`Select ${tmpl.label} template`}
+              >
+                <TemplateThumb label={tmpl.label} selected={selectedTemplate === tmpl.id} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[10px] border border-dashed border-border bg-gray-50/50 p-4 text-center text-xs text-text-tertiary">
+            No templates yet for this category.
+            <br />
+            <span className="italic">Coming soon!</span>
+          </div>
+        )}
 
         {/* Loading skeleton placeholder */}
         <div className="mt-2 animate-pulse space-y-2">
