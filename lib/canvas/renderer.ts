@@ -87,6 +87,13 @@ function isLayerVisible(
 ): boolean {
   if (layerId in toggles) return toggles[layerId];
   if (!defaultVisible) return false;
+
+  // hairStyle="bald" → hide the hair layer
+  const hairStyle = state?.hairStyle as string | undefined;
+  if (hairStyle === "bald" && (layerId === "hair" || layerId.startsWith("hair-"))) {
+    return false;
+  }
+
   if (condition && state) {
     return layerConditionMet(condition, state);
   }
@@ -203,6 +210,83 @@ export function drawBackground(
   }
 }
 
+/* ── Helper — draw a layer canvas with optional body transform ── */
+
+/**
+ * Compute a canvas transform (scaleX, scaleY) for a layer based on
+ * the character's body properties (height, width, headSize).
+ *
+ * Returns `null` when the transform is identity (no change)
+ * so callers can skip the save/restore overhead.
+ */
+function getLayerBodyTransform(
+  layerId: string,
+  layerName: string,
+  state: Record<string, unknown>,
+): { scaleX: number; scaleY: number } | null {
+  const h = (state.height as number) ?? 55;
+  const w = (state.width as number) ?? 50;
+  const hs = (state.headSize as number) ?? 45;
+
+  // Base scale: default values map to 1.0 (no change)
+  const scaleY = 1 + (h - 55) * 0.01;
+  const scaleX = 1 + (w - 50) * 0.01;
+
+  // Head-adjacent layers get an additional headSize scale
+  const isHeadLayer =
+    layerId === "head" ||
+    layerId.startsWith("head") ||
+    layerName.toLowerCase().includes("head") ||
+    layerId.includes("hair") ||
+    layerId.includes("eye") ||
+    layerId.includes("brow") ||
+    layerId.includes("mouth") ||
+    layerId.includes("face") ||
+    layerId.includes("ear") ||
+    layerId.includes("nose") ||
+    layerId === "helmet" ||
+    layerId === "kabuto" ||
+    layerId === "menpo";
+
+  const headScale = isHeadLayer ? 1 + (hs - 45) * 0.01 : 1;
+
+  const totalScaleX = scaleX * headScale;
+  const totalScaleY = scaleY * headScale;
+
+  // Skip identity transform (no change — within tolerance)
+  if (
+    Math.abs(totalScaleX - 1) < 0.01 &&
+    Math.abs(totalScaleY - 1) < 0.01
+  ) {
+    return null;
+  }
+
+  return { scaleX: totalScaleX, scaleY: totalScaleY };
+}
+
+/**
+ * Draw a layer canvas onto the result canvas, optionally with a
+ * body-proportion transform applied around the center.
+ */
+function drawLayerWithTransform(
+  ctx: CanvasRenderingContext2D,
+  layerCanvas: HTMLCanvasElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  transform: { scaleX: number; scaleY: number } | null,
+): void {
+  if (!transform) {
+    ctx.drawImage(layerCanvas, 0, 0);
+    return;
+  }
+  ctx.save();
+  ctx.translate(canvasWidth / 2, canvasHeight / 2);
+  ctx.scale(transform.scaleX, transform.scaleY);
+  ctx.translate(-canvasWidth / 2, -canvasHeight / 2);
+  ctx.drawImage(layerCanvas, 0, 0);
+  ctx.restore();
+}
+
 /* ── Main entry point ── */
 
 /**
@@ -268,8 +352,14 @@ export async function renderCharacter(
       defaultColors,
     );
 
+    const bodyTransform = getLayerBodyTransform(
+      layer.id,
+      layer.name,
+      state,
+    );
+
     if (cached) {
-      ctx.drawImage(cached, 0, 0);
+      drawLayerWithTransform(ctx, cached, width, height, bodyTransform);
       continue;
     }
 
@@ -294,7 +384,7 @@ export async function renderCharacter(
         layerCanvas,
       );
 
-      ctx.drawImage(layerCanvas, 0, 0);
+      drawLayerWithTransform(ctx, layerCanvas, width, height, bodyTransform);
     } catch {
       // Silently skip layers that fail to render
       console.warn(`[renderer] Failed to render layer "${layer.id}"`);

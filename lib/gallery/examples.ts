@@ -16,6 +16,10 @@ const fantasyState = {
   categoryId: "fantasy",
 } as const;
 
+const sciFiState = {
+  categoryId: "sci-fi",
+} as const;
+
 export const GALLERY_EXAMPLES: GalleryExample[] = [
   {
     id: "cartoon-cheerful",
@@ -234,6 +238,87 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
       },
       backgroundMode: "solid",
       background: { type: "solid", color: "#0f0f1a" },
+    },
+  },
+  // ── Sci-Fi: Celestial Envoy ──
+  {
+    id: "celestial-envoy",
+    name: "Celestial Envoy",
+    description: "An ethereal cosmic being clad in luminous energy armour with a shimmering visor and holographic escort.",
+    category: "Sci-Fi",
+    templateId: "sci-fi-armor",
+    state: {
+      ...sciFiState,
+      skinTone: "#C68642",
+      expression: "neutral",
+      outfitColors: {
+        primary: "#7C3AED",
+        secondary: "#06B6D4",
+        accent: "#FBBF24",
+      },
+      backgroundMode: "gradient",
+      background: { type: "gradient", color: "#0f0f1a", secondaryColor: "#1a0533" },
+    },
+  },
+  // ── Sci-Fi: Shadow Agent ──
+  {
+    id: "shadow-agent",
+    name: "Shadow Agent",
+    description: "A covert operative in matte-black tactical armour with a stealth energy shield and silent drone escort.",
+    category: "Sci-Fi",
+    templateId: "sci-fi-armor",
+    state: {
+      ...sciFiState,
+      skinTone: "#5C3A21",
+      expression: "serious",
+      outfitColors: {
+        primary: "#111827",
+        secondary: "#374151",
+        accent: "#22D3EE",
+      },
+      backgroundMode: "solid",
+      background: { type: "solid", color: "#030712" },
+    },
+  },
+  // ── Samurai ──
+  {
+    id: "samurai-crimson",
+    name: "Crimson Daimyo",
+    description: "A noble samurai in crimson-laced armor with a katana at their side, bearing an ancient family crest.",
+    category: "Historical",
+    templateId: "samurai",
+    state: {
+      categoryId: "historical",
+      skinTone: "#D4A574",
+      hairColor: "#1A1A1A",
+      expression: "serious",
+      outfitColors: {
+        primary: "#8B4513",
+        secondary: "#5C4033",
+        accent: "#C0392B",
+      },
+      backgroundMode: "solid",
+      background: { type: "solid", color: "#1a1a2e" },
+    },
+  },
+  {
+    id: "samurai-shadow",
+    name: "Shadow Ronin",
+    description: "A wandering ronin in dark armour with an onyx menpo face mask, both blades gleaming in the dark.",
+    category: "Historical",
+    templateId: "samurai",
+    state: {
+      categoryId: "historical",
+      skinTone: "#8B5E3C",
+      hairColor: "#0D0D0D",
+      expression: "neutral",
+      outfitColors: {
+        primary: "#374151",
+        secondary: "#1F2937",
+        accent: "#7C3AED",
+      },
+      backgroundMode: "solid",
+      background: { type: "solid", color: "#030712" },
     },
   },
 ];

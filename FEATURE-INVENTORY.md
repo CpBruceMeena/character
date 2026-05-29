@@ -1,6 +1,6 @@
 # CharacterForge Pro — Feature Inventory
 
-> **Last updated:** 2026-05-29
+> **Last updated:** 2026-05-30
 > **Source:** Cross-referenced codebase (`components/`, `lib/`, `app/`) against PRD, DESIGN, test plans, and eng review.
 
 ---
@@ -37,10 +37,10 @@
 | 1.4.1 | Gallery grid (2×2 desktop) | ✅ Implemented | Shows 4 example characters |
 | 1.4.2 | Gallery cards with gradient overlays | ✅ Implemented | Each card has a colored gradient top |
 | 1.4.3 | "Fantasy Knight" example | ✅ Implemented | Uses `fantasy-knight` template |
-| 1.4.4 | Steampunk Explorer example | ❌ Missing | Referenced in PRD but not implemented |
-| 1.4.5 | Celestial Envoy example | ❌ Missing | Referenced in PRD but not implemented |
-| 1.4.6 | Shadow Agent example | ❌ Missing | Referenced in PRD but not implemented |
-| 1.4.7 | Gallery character data source | ✅ Implemented via `lib/gallery/examples.ts` | Defines 4 example characters |
+| 1.4.4 | Steampunk Explorer example | ✅ Implemented | Uses `steampunk-explorer` template |
+| 1.4.5 | Celestial Envoy example | ✅ **New** | Uses `sci-fi-armor` template |
+| 1.4.6 | Shadow Agent example | ✅ **New** | Uses `sci-fi-armor` template |
+| 1.4.7 | Gallery character data source | ✅ Implemented via `lib/gallery/examples.ts` | Defines 14 example characters across 4 templates |
 
 ### 1.5 Export Formats Section (`ExportFormats.tsx`)
 | # | Feature | Status | Details |
@@ -165,14 +165,13 @@
 | 3.1.3 | Real-time re-render on changes | ✅ Implemented | Re-renders when character state changes |
 | 3.1.4 | Loading state | ✅ Implemented | Shows skeleton/placeholder while rendering |
 | 3.1.5 | Error boundary wrapper | ✅ Implemented | Wraps canvas area separately |
-| 3.1.6 | Canvas zoom/pan | ❌ Missing | Not implemented |
+| 3.1.6 | Canvas zoom/pan | ✅ **New** | Mouse wheel zoom, click-drag pan, double-click reset |
 
 ### 3.2 Canvas Controls (`CanvasControls.tsx`)
 | # | Feature | Status | Details |
 |---|---------|--------|---------|
-| 3.2.1 | Reset zoom button | ❌ Missing | No zoom feature exists |
-| 3.2.2 | Auto-fit button | ❌ Missing | No auto-fit control |
-| 3.2.3 | Zoom level display | ❌ Missing | Not implemented |
+| 3.2.1 | Reset view button | ✅ **New** | Reset view (zoom to 100%, center pan) via icon button + clickable zoom percentage |
+| 3.2.2 | Zoom level display | ✅ **New** | Reads from UI store, updates in real-time |
 
 ### 3.3 Render Cache (`render-cache.ts`)
 | # | Feature | Status | Details |
@@ -345,9 +344,9 @@
 ### 5.7 Future Templates (planned, not implemented)
 | # | Feature | Status | Details |
 |---|---------|--------|---------|
-| 5.7.1 | Steampunk Explorer | ❌ Planned | Modern category, referenced in PRD |
-| 5.7.2 | Modern Casual | ❌ Planned | Modern category |
-| 5.7.3 | Samurai | ❌ Planned | Historical category |
+| 5.7.1 | Steampunk Explorer | ✅ **New** | Modern category, explorer aesthetic |
+| 5.7.2 | Modern Casual | ✅ **New** | Modern category, street-style |
+| 5.7.3 | Samurai | ✅ **New** | Historical category, 21 layers, 19 controls, 6 color zones |
 | 5.7.4 | Victorian Gentleman | ❌ Planned | Historical category |
 | 5.7.5 | More cartoon variants | ❌ Planned | Different body types, styles |
 | 5.7.6 | More fantasy variants | ❌ Planned | Mage, archer, rogue types |
@@ -386,8 +385,8 @@
 | 8.4 | `lib/canvas/__tests__/export.test.ts` | ✅ **New** | SVG blob, MIME type, viewBox, filename, scale |
 | 8.5 | `lib/utils/__tests__/use-url-sharing.test.ts` | ✅ **New** | Store integration, encode/decode, randomize/reset |
 | 8.6 | `npm test` script | ✅ **New** | Added to package.json |
-| 8.7 | Component rendering tests | ❌ Missing | No React component tests (ControlPanel, EditorLayout, etc.) |
-| 8.8 | Template definition tests | ❌ Missing | Validate schema compliance |
+| 8.7 | Component rendering tests | ✅ **New** | ErrorBoundary (5 tests), ExportDialog (8 tests), ControlPanel (11 tests) |
+| 8.8 | Template definition tests | ✅ **New** | Schema validation, registry integration, layer/control validation — 122 tests across 5 templates |
 | 8.9 | End-to-end / integration tests | ❌ Missing | No Playwright/Cypress tests |
 
 ---
@@ -442,15 +441,15 @@
 |----------|-------------|---------|-----------------|-------|
 | Landing Page | 18 | 0 | 3 | 21 |
 | Editor | 32 | 1 | 0 | 33 |
-| Canvas & Rendering | 17 | 0 | 4 | 21 |
+| Canvas & Rendering | 18 | 0 | 3 | 21 |
 | State Management | 22 | 0 | 0 | 22 |
-| Template System | 30 | 0 | 6 | 36 |
+| Template System | 32 | 0 | 4 | 36 |
 | Shared Components | 7 | 0 | 0 | 7 |
 | Debug Tools | 1 | 1 | 0 | 2 |
-| Testing | 6 | 0 | 3 | 9 |
+| Testing | 7 | 0 | 2 | 9 |
 | Infrastructure | 11 | 0 | 2 | 13 |
 | Planned/Future | 0 | 0 | 17 | 17 |
-| **Total** | **144** | **2** | **35** | **181** |
+| **Total** | **148** | **2** | **31** | **181** |
 
 > **Legend:**
 > - ✅ Implemented — working in current codebase

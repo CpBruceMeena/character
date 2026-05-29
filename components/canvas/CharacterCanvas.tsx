@@ -130,6 +130,17 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
   const outfitColors = useCharacterStore((s) => s.outfitColors);
   const accessories = useCharacterStore((s) => s.accessories);
   const bgMode = useCharacterStore((s) => s.backgroundMode);
+  const expression = useCharacterStore((s) => s.expression);
+  const eyeSize = useCharacterStore((s) => s.eyeSize);
+  const bgColor = useCharacterStore((s) => s.background.color);
+  const bgSecondaryColor = useCharacterStore((s) => s.background.secondaryColor);
+  const gender = useCharacterStore((s) => s.gender);
+  const bodyType = useCharacterStore((s) => s.bodyType);
+  const height = useCharacterStore((s) => s.height);
+  const width = useCharacterStore((s) => s.width);
+  const headSize = useCharacterStore((s) => s.headSize);
+  const limbProportions = useCharacterStore((s) => s.limbProportions);
+  const partVisibility = useCharacterStore((s) => s.partVisibility);
 
   // Clear the layer render cache when switching templates
   useEffect(() => {
@@ -191,7 +202,7 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
       ctx.clearRect(0, 0, w, h);
       ctx.drawImage(rendered, 0, 0);
     });
-  }, [templateId, skinTone, hairColor, hairStyle, outfit, outfitColors, accessories, bgMode, resizeKey, categoryId]);
+  }, [templateId, skinTone, hairColor, hairStyle, outfit, outfitColors, accessories, bgMode, expression, eyeSize, bgColor, bgSecondaryColor, gender, bodyType, height, width, headSize, limbProportions, partVisibility, resizeKey, categoryId]);
 
   // ── Wheel zoom handler ──
   const handleWheel = useCallback(

@@ -39,7 +39,7 @@ const categories: CategoryDefinition[] = [
     id: "historical",
     label: "Historical",
     description: "Period-inspired costumes and classic archetypes",
-    templateIds: [],
+    templateIds: ["samurai"],
     order: 4,
   },
 ];

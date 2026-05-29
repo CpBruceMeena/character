@@ -8,6 +8,9 @@ import type { GalleryExample } from "@/lib/gallery/examples";
 // Import template definitions so registry is populated
 import "@/lib/templates/definitions/cartoon-base-a";
 import "@/lib/templates/definitions/fantasy-knight";
+import "@/lib/templates/definitions/sci-fi-armor";
+import "@/lib/templates/definitions/steampunk-explorer";
+import "@/lib/templates/definitions/modern-casual";
 
 interface GalleryCharacterCardProps {
   example: GalleryExample;
@@ -37,19 +40,20 @@ export function GalleryCharacterCard({ example }: GalleryCharacterCardProps) {
   useEffect(() => {
     const template = getTemplate(example.templateId);
     if (!template) {
-      setSvg(null);
+      setSvg("");
       return;
     }
     const result = composeCharacterSvg(template, example.state);
     setSvg(result);
   }, [example]);
 
-  // During SSR and before hydration, show a skeleton (svg is null)
-  if (!svg) {
+  // During SSR and before hydration (svg is null), show a skeleton
+  if (svg === null) {
     return <CardSkeleton />;
   }
 
-  if (!svg) {
+  // If svg is an empty string, the template wasn't found
+  if (svg === "") {
     return (
       <div className="flex aspect-[2/3] items-center justify-center rounded-[24px] border border-dashed border-gray-300 bg-gray-50 p-4">
         <p className="text-xs text-gray-400">Template not found</p>
@@ -83,9 +87,9 @@ export function GalleryCharacterCard({ example }: GalleryCharacterCardProps) {
         </p>
       </div>
 
-      {/* Hover overlay → editor link */}
+      {/* Hover overlay → editor link with template pre-selected */}
       <a
-        href="/editor"
+        href={`/editor?template=${example.templateId}`}
         className="absolute inset-0 z-10 flex items-center justify-center gap-2 rounded-[24px] bg-amber-500/90 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         aria-label={`Open ${example.name} in editor`}
       >

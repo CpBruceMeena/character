@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { IconButton } from "@/components/shared/IconButton";
 import { useCharacterStore } from "@/lib/stores/character-store";
+import { useUIStore } from "@/lib/stores/ui-store";
 
 export function CanvasControls() {
-  const [zoom, setZoom] = useState(100);
+  const zoom = useUIStore((s) => s.canvasZoom);
+  const setCanvasZoom = useUIStore((s) => s.setCanvasZoom);
+  const resetCanvasView = useUIStore((s) => s.resetCanvasView);
   const bgMode = useCharacterStore((s) => s.backgroundMode);
   const setBgMode = useCharacterStore((s) => s.setBackgroundMode);
 
@@ -42,22 +44,39 @@ export function CanvasControls() {
 
       {/* Zoom controls */}
       <div className="flex items-center gap-1">
+        {/* Fit to view */}
+        <IconButton
+          label="Reset view"
+          onClick={resetCanvasView}
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v5h5" />
+          </svg>
+        </IconButton>
+
+        <div className="mx-1 h-5 w-px bg-border" />
+
         <IconButton
           label="Zoom out"
-          onClick={() => setZoom((z) => Math.max(25, z - 10))}
+          onClick={() => setCanvasZoom(Math.max(25, zoom - 10))}
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
           </svg>
         </IconButton>
 
-        <span className="min-w-[36px] text-center text-xs tabular-nums text-text-secondary">
+        <button
+          onClick={resetCanvasView}
+          className="min-w-[36px] text-center text-xs tabular-nums text-text-secondary transition-colors hover:text-text-primary"
+          title="Reset view"
+        >
           {zoom}%
-        </span>
+        </button>
 
         <IconButton
           label="Zoom in"
-          onClick={() => setZoom((z) => Math.min(200, z + 10))}
+          onClick={() => setCanvasZoom(Math.min(300, zoom + 10))}
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

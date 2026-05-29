@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { TopBar } from "./TopBar";
 import { CategorySidebar } from "./CategorySidebar";
 import { CharacterCanvas } from "@/components/canvas/CharacterCanvas";
@@ -21,6 +22,8 @@ import type { CategoryId } from "@/lib/templates/schema";
 import "@/lib/templates/definitions/cartoon-base-a";
 import "@/lib/templates/definitions/fantasy-knight";
 import "@/lib/templates/definitions/sci-fi-armor";
+import "@/lib/templates/definitions/steampunk-explorer";
+import "@/lib/templates/definitions/modern-casual";
 
 // Init persistence on the client
 import { initPersistence } from "@/lib/stores/character-store";
@@ -46,10 +49,29 @@ export function EditorLayout() {
   // Initialize state persistence once on mount
   useEffect(() => { initPersistence(); }, []);
 
+  const searchParams = useSearchParams();
+
   const selectedCategory = useCharacterStore((s) => s.categoryId);
   const selectedTemplate = useCharacterStore((s) => s.templateId);
   const selectCategory = useCharacterStore((s) => s.selectCategory);
   const selectTemplate = useCharacterStore((s) => s.selectTemplate);
+
+  // When a template param is in the URL (e.g. from gallery), auto-select it atomically
+  useEffect(() => {
+    const templateParam = searchParams.get("template");
+    if (!templateParam) return;
+    // Find which category this template belongs to
+    const allTemplates = getCategories()
+      .flatMap((c) => c.templateIds.map((tid) => ({ tid, catId: c.id })));
+    const match = allTemplates.find((t) => t.tid === templateParam);
+    if (match && templateParam !== selectedTemplate) {
+      // Batch both updates atomically — avoids briefly resetting templateId to null
+      useCharacterStore.setState({
+        categoryId: match.catId,
+        templateId: templateParam,
+      });
+    }
+  }, []); // only on mount
 
   const isSidebarOpen = useUIStore((s) => s.isCategorySidebarOpen);
   const isControlsOpen = useUIStore((s) => s.isControlPanelOpen);

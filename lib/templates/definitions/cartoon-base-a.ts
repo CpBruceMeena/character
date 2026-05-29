@@ -549,5 +549,16 @@ registerTemplate({
     ]},
     { id: "outfit-primary", type: "color", label: "Primary Color", section: "clothing", targets: ["outfit-primary", "outfitColors.primary"], defaultValue: "#4A6FA5" },
     { id: "outfit-secondary", type: "color", label: "Secondary Color", section: "clothing", targets: ["outfit-secondary", "outfitColors.secondary"], defaultValue: "#D4A574" },
+
+    // Accessories
+    { id: "backpack", type: "toggle", label: "Backpack", section: "accessories", targets: ["backpack"], defaultValue: false },
+    { id: "scarf", type: "toggle", label: "Scarf", section: "accessories", targets: ["scarf"], defaultValue: false },
+    { id: "necklace", type: "toggle", label: "Necklace", section: "accessories", targets: ["necklace"], defaultValue: false },
+    { id: "earrings", type: "toggle", label: "Earrings", section: "accessories", targets: ["earrings"], defaultValue: false },
+    { id: "glasses", type: "toggle", label: "Glasses", section: "accessories", targets: ["glasses"], defaultValue: false },
+    { id: "mask", type: "toggle", label: "Mask", section: "accessories", targets: ["mask"], defaultValue: false },
+    { id: "headband", type: "toggle", label: "Headband", section: "accessories", targets: ["headband"], defaultValue: false },
+    { id: "hat", type: "toggle", label: "Hat", section: "accessories", targets: ["hat"], defaultValue: false },
+    { id: "crown", type: "toggle", label: "Crown", section: "accessories", targets: ["crown"], defaultValue: false },
   ],
 });
