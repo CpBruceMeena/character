@@ -1,7 +1,7 @@
 /* ── Template Schema — PRD Section 20.5 ── */
 
 /** Category identifiers used across the app */
-export type CategoryId = "cartoon" | "fantasy" | "modern" | "historical";
+export type CategoryId = "cartoon" | "fantasy" | "sci-fi" | "modern" | "historical";
 
 /** Conditions that control when a layer is visible based on character state */
 export interface LayerCondition {

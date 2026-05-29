@@ -23,18 +23,24 @@ const categories: CategoryDefinition[] = [
     order: 1,
   },
   {
+    id: "sci-fi",
+    label: "Sci-Fi",
+    description: "Futuristic armor, cybernetics, and space explorers",
+    templateIds: ["sci-fi-armor"],
+    order: 2,
+  },    {
     id: "modern",
     label: "Modern",
     description: "Contemporary urban and casual styles",
-    templateIds: [],
-    order: 2,
+    templateIds: ["steampunk-explorer", "modern-casual"],
+    order: 3,
   },
   {
     id: "historical",
     label: "Historical",
     description: "Period-inspired costumes and classic archetypes",
     templateIds: [],
-    order: 3,
+    order: 4,
   },
 ];
 

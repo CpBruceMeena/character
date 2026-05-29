@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 
 import { useCharacterStore } from "@/lib/stores/character-store";
+import { useUIStore } from "@/lib/stores/ui-store";
 import { getTemplate } from "@/lib/templates/registry";
 import { renderCharacter, drawBackground } from "@/lib/canvas/renderer";
 import { clearLayerCache } from "@/lib/canvas/render-cache";
@@ -95,13 +96,31 @@ function drawPlaceholder(
   ctx.restore();
 }
 
-/* ── Character Canvas ── */
+/* ── Character Canvas with Zoom/Pan ── */
 
 export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const renderRef = useRef<number>(0);
   const [resizeKey, setResizeKey] = useState(0);
+
+  // Drag state for panning
+  const dragRef = useRef<{ active: boolean; startX: number; startY: number; panX: number; panY: number }>({
+    active: false,
+    startX: 0,
+    startY: 0,
+    panX: 0,
+    panY: 0,
+  });
+
+  // Zoom/pan from UI store
+  const canvasZoom = useUIStore((s) => s.canvasZoom);
+  const canvasPanX = useUIStore((s) => s.canvasPanX);
+  const canvasPanY = useUIStore((s) => s.canvasPanY);
+  const setCanvasZoom = useUIStore((s) => s.setCanvasZoom);
+  const setCanvasPan = useUIStore((s) => s.setCanvasPan);
+  const resetCanvasView = useUIStore((s) => s.resetCanvasView);
 
   // Individual selectors trigger re-render only when the specific value changes
   const skinTone = useCharacterStore((s) => s.skinTone);
@@ -115,7 +134,8 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
   // Clear the layer render cache when switching templates
   useEffect(() => {
     clearLayerCache();
-  }, [templateId]);
+    resetCanvasView();
+  }, [templateId, resetCanvasView]);
 
   // Observe container size changes
   useEffect(() => {
@@ -134,8 +154,9 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
     if (!canvas) return;
 
     const renderId = ++renderRef.current;
-    const container = canvas.parentElement!;
-    const rect = container.getBoundingClientRect();
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const rect = viewport.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     const w = Math.round(rect.width * dpr);
     const h = Math.round(rect.height * dpr);
@@ -172,17 +193,81 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
     });
   }, [templateId, skinTone, hairColor, hairStyle, outfit, outfitColors, accessories, bgMode, resizeKey, categoryId]);
 
+  // ── Wheel zoom handler ──
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -10 : 10;
+      const newZoom = Math.max(25, Math.min(300, canvasZoom + delta));
+      setCanvasZoom(newZoom);
+    },
+    [canvasZoom, setCanvasZoom],
+  );
+
+  // ── Mouse drag handlers ──
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      // Only drag with left button
+      if (e.button !== 0) return;
+      dragRef.current = {
+        active: true,
+        startX: e.clientX,
+        startY: e.clientY,
+        panX: canvasPanX,
+        panY: canvasPanY,
+      };
+    },
+    [canvasPanX, canvasPanY],
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!dragRef.current.active) return;
+      const dx = e.clientX - dragRef.current.startX;
+      const dy = e.clientY - dragRef.current.startY;
+      setCanvasPan(dragRef.current.panX + dx, dragRef.current.panY + dy);
+    },
+    [setCanvasPan],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    dragRef.current.active = false;
+  }, []);
+
+  // ── Double-click reset ──
+  const handleDoubleClick = useCallback(() => {
+    resetCanvasView();
+  }, [resetCanvasView]);
+
+  const zoomPercent = canvasZoom / 100;
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center overflow-hidden p-4">
       <div
         ref={containerRef}
-        className="relative flex w-full max-w-[600px] flex-1 items-center justify-center"
+        className="relative flex w-full max-w-[600px] flex-1 items-center justify-center overflow-hidden"
       >
-        <canvas
-          ref={canvasRef}
-          className="h-full w-full rounded-[16px]"
-          aria-label="Character preview"
-        />
+        {/* Viewport — handles zoom/pan transform */}
+        <div
+          ref={viewportRef}
+          className={`absolute inset-0 flex items-center justify-center ${dragRef.current.active ? "cursor-grabbing" : "cursor-grab"}`}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onDoubleClick={handleDoubleClick}
+          style={{
+            transform: `scale(${zoomPercent}) translate(${canvasPanX / zoomPercent}px, ${canvasPanY / zoomPercent}px)`,
+            transformOrigin: "center center",
+          }}
+        >
+          <canvas
+            ref={canvasRef}
+            className="h-full w-full rounded-[16px]"
+            aria-label="Character preview"
+          />
+        </div>
         {process.env.NODE_ENV !== "production" && <CacheIndicator />}
       </div>
     </div>

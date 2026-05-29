@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { TopBar } from "./TopBar";
 import { CategorySidebar } from "./CategorySidebar";
 import { CharacterCanvas } from "@/components/canvas/CharacterCanvas";
@@ -13,11 +13,17 @@ import { useUIStore } from "@/lib/stores/ui-store";
 import { getCategories, getTemplatesForCategory } from "@/lib/templates/registry";
 import { useOnboarding } from "@/lib/utils/use-onboarding";
 import { OnboardingTooltip } from "./OnboardingTooltip";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { UrlStateSync } from "@/lib/utils/use-url-sharing";
 import type { CategoryId } from "@/lib/templates/schema";
 
 // Static imports ensure template definitions are registered at module load
 import "@/lib/templates/definitions/cartoon-base-a";
 import "@/lib/templates/definitions/fantasy-knight";
+import "@/lib/templates/definitions/sci-fi-armor";
+
+// Init persistence on the client
+import { initPersistence } from "@/lib/stores/character-store";
 
 function OnboardingOverlay() {
   const { isActive, currentStep, step, totalSteps, next, dismiss, hydrated } =
@@ -37,6 +43,9 @@ function OnboardingOverlay() {
 }
 
 export function EditorLayout() {
+  // Initialize state persistence once on mount
+  useEffect(() => { initPersistence(); }, []);
+
   const selectedCategory = useCharacterStore((s) => s.categoryId);
   const selectedTemplate = useCharacterStore((s) => s.templateId);
   const selectCategory = useCharacterStore((s) => s.selectCategory);
@@ -89,7 +98,8 @@ export function EditorLayout() {
         : "base-a";
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-page">
+    <ErrorBoundary name="EditorLayout">
+      <div className="flex min-h-screen flex-col bg-bg-page">
       <TopBar
         onToggleSidebar={toggleSidebar}
         onToggleControls={toggleControlPanel}
@@ -111,10 +121,12 @@ export function EditorLayout() {
 
         {/* ── Center: Canvas ── */}
         <main className="relative flex flex-1 flex-col overflow-auto">
-          <CharacterCanvas
-            categoryId={effectiveCategory}
-            templateId={effectiveTemplate}
-          />
+          <ErrorBoundary name="CharacterCanvas">
+            <CharacterCanvas
+              categoryId={effectiveCategory}
+              templateId={effectiveTemplate}
+            />
+          </ErrorBoundary>
           <CanvasControls />
 
           {/* Debug: render cache inspector (dev-only) */}
@@ -130,6 +142,10 @@ export function EditorLayout() {
 
       {/* ── Onboarding Tour ── */}
       <OnboardingOverlay />
-    </div>
+
+      {/* ── URL State Sync (invisible) ── */}
+      <UrlStateSync />
+      </div>
+    </ErrorBoundary>
   );
 }

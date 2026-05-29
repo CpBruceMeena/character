@@ -59,6 +59,7 @@ export function ExportDialog() {
   // Format & scale state
   const [format, setFormat] = useState<ExportFormat>("png");
   const [scale, setScale] = useState<ScaleValue>(1);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>("fullbody");
 
   // Export progress
@@ -263,7 +264,7 @@ export function ExportDialog() {
           <div>
             <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">Format</p>
             <div className="flex gap-2">
-              {(["png", "jpeg"] as ExportFormat[]).map((fmt) => (
+              {(["png", "jpeg", "svg"] as ExportFormat[]).map((fmt) => (
                 <button
                   key={fmt}
                   onClick={() => handleFormatChange(fmt)}
@@ -276,36 +277,48 @@ export function ExportDialog() {
                 >
                   {fmt.toUpperCase()}
                   <span className="block text-[10px] font-normal opacity-70">
-                    {fmt === "png" ? "with transparency" : "solid background"}
+                    {fmt === "png" ? "with alpha" : fmt === "jpeg" ? "solid bg" : "vector, scalable"}
                   </span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Scale */}
-          <div>
-            <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">Scale</p>
-            <div className="flex gap-2">
-              {([1, 2, 4] as ScaleValue[]).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleScaleChange(s)}
-                  className={`flex-1 rounded-[8px] border px-3 py-2 text-sm font-medium transition-all ${
-                    scale === s
-                      ? "border-amber-400 bg-amber-50 text-amber-800"
-                      : "border-border text-text-secondary hover:border-gray-300 hover:bg-gray-50"
-                  }`}
-                  aria-pressed={scale === s}
-                >
-                  {s}×
-                  <span className="block text-[10px] font-normal opacity-70">
-                    {dims.width}×{dims.height}px
-                  </span>
-                </button>
-              ))}
+          {/* Scale (hidden for SVG — vector format doesn't need scaling) */}
+          {currentFormat !== "svg" && (
+            <div>
+              <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">Scale</p>
+              <div className="flex gap-2">
+                {([1, 2, 4] as ScaleValue[]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => handleScaleChange(s)}
+                    className={`flex-1 rounded-[8px] border px-3 py-2 text-sm font-medium transition-all ${
+                      scale === s
+                        ? "border-amber-400 bg-amber-50 text-amber-800"
+                        : "border-border text-text-secondary hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                    aria-pressed={scale === s}
+                  >
+                    {s}×
+                    <span className="block text-[10px] font-normal opacity-70">
+                      {dims.width}×{dims.height}px
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          {/* SVG info */}
+          {currentFormat === "svg" && (
+            <div>
+              <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">Format details</p>
+              <div className="rounded-[8px] border border-border bg-bg-page px-3 py-2 text-xs text-text-tertiary">
+                SVG exports at {dims.width}×{dims.height}px viewport. Perfectly scalable — no quality loss at any size.
+                Layers use inline SVGs with embedded color zones.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Preview ── */}
@@ -348,8 +361,7 @@ export function ExportDialog() {
         {/* ── Actions ── */}
         <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
           <span className="mr-auto text-xs text-text-tertiary">
-            {dims.width} × {dims.height}px · {currentFormat.toUpperCase()}
-            {currentTransparent && " · Transparent"}
+            {currentFormat === "svg" ? "SVG · vector, infinitely scalable" : `${dims.width} × ${dims.height}px · ${currentFormat.toUpperCase()}${currentTransparent ? " · Transparent" : ""}`}
           </span>
           <Button variant="secondary" size="sm" onClick={() => close(false)}>
             Cancel

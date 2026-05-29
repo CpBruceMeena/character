@@ -14,6 +14,10 @@ export interface UIState {
   isCategorySidebarOpen: boolean;
   isControlPanelOpen: boolean;
   toasts: Toast[];
+  // Canvas viewport
+  canvasZoom: number;
+  canvasPanX: number;
+  canvasPanY: number;
 }
 
 export interface UIActions {
@@ -24,6 +28,9 @@ export interface UIActions {
   toggleControlPanel: () => void;
   addToast: (toast: Omit<Toast, "id">) => void;
   dismissToast: (id: string) => void;
+  setCanvasZoom: (zoom: number) => void;
+  setCanvasPan: (x: number, y: number) => void;
+  resetCanvasView: () => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()((set, get) => ({
@@ -32,6 +39,9 @@ export const useUIStore = create<UIState & UIActions>()((set, get) => ({
   isCategorySidebarOpen: true,
   isControlPanelOpen: true,
   toasts: [],
+  canvasZoom: 100,
+  canvasPanX: 0,
+  canvasPanY: 0,
 
   setActiveControlSection: (section) => set({ activeControlSection: section }),
   toggleExportDialog: () => set((s) => ({ isExportDialogOpen: !s.isExportDialogOpen })),
@@ -55,4 +65,8 @@ export const useUIStore = create<UIState & UIActions>()((set, get) => ({
     set((s) => ({
       toasts: s.toasts.filter((t) => t.id !== id),
     })),
+
+  setCanvasZoom: (canvasZoom) => set({ canvasZoom }),
+  setCanvasPan: (canvasPanX, canvasPanY) => set({ canvasPanX, canvasPanY }),
+  resetCanvasView: () => set({ canvasZoom: 100, canvasPanX: 0, canvasPanY: 0 }),
 }));

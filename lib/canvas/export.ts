@@ -23,11 +23,12 @@
  */
 
 import { renderCharacter } from "@/lib/canvas/renderer";
+import { composeCharacterSvg } from "@/lib/canvas/render-svg";
 import type { TemplateDefinition } from "@/lib/templates/schema";
 
 /* ── Types ── */
 
-export type ExportFormat = "png" | "jpeg";
+export type ExportFormat = "png" | "jpeg" | "svg";
 
 export interface ExportOptions {
   /** Active template definition */
@@ -116,8 +117,29 @@ function buildFilename(
     .trim()
     .replace(/\s+/g, "-")
     .toLowerCase() || "character";
-  const scaleLabel = scale > 1 ? `@${scale}x` : "";
+  const scaleLabel = scale > 1 && format !== "svg" ? `@${scale}x` : "";
   return `${safe}${scaleLabel}.${format}`;
+}
+
+/* ── SVG export helper ── */
+
+/**
+ * Export the character as an SVG string.
+ * Uses the existing SVG compositing pipeline to produce a standalone SVG file.
+ */
+function exportSvg(
+  template: TemplateDefinition,
+  state: Record<string, unknown>,
+  width: number,
+  height: number,
+): Blob {
+  const svg = composeCharacterSvg(template, state);
+  // Rewrite the viewBox to match the requested dimensions
+  const adjustedSvg = svg.replace(
+    /viewBox="[^"]*"/,
+    `viewBox="0 0 ${width} ${height}"`,
+  );
+  return new Blob([adjustedSvg], { type: "image/svg+xml;charset=utf-8" });
 }
 
 /* ── Main export function ── */
@@ -144,6 +166,19 @@ export async function exportCharacter(
     scale,
     transparent = false,
   } = options;
+
+  // Fast-path for SVG export — no canvas needed
+  if (format === "svg") {
+    const blob = exportSvg(template, state, width, height);
+    const charName = (state.charName as string) ?? "character";
+    return {
+      blob,
+      filename: buildFilename(charName, "svg", scale),
+      width: width * scale,
+      height: height * scale,
+      sizeBytes: blob.size,
+    };
+  }
 
   // Ensure minimum dimensions
   const logicalW = Math.max(64, width);

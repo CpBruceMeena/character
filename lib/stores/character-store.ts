@@ -1,6 +1,25 @@
 import { create } from "zustand";
 import { temporal, type TemporalState } from "zundo";
 
+/* ── Persistence ── */
+
+const PERSIST_KEY = "cforge-character-state";
+
+function loadSavedState(): Partial<CharacterState> {
+  try {
+    const saved = localStorage.getItem(PERSIST_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Strip any fields that don't belong to CharacterState
+      const { charName, gender, bodyType, categoryId, templateId, height, width, headSize, limbProportions, leftRightVariation, partVisibility, eyeSize, expression, skinTone, hairStyle, hairColor, outfit, outfitColors, accessories, background, backgroundMode } = parsed;
+      return { charName, gender, bodyType, categoryId, templateId, height, width, headSize, limbProportions, leftRightVariation, partVisibility, eyeSize, expression, skinTone, hairStyle, hairColor, outfit, outfitColors, accessories, background, backgroundMode };
+    }
+  } catch {
+    // Storage unavailable or corrupt — start fresh
+  }
+  return {};
+}
+
 /* ── Types ── */
 
 export type Gender = "masculine" | "feminine" | "androgynous";
@@ -132,10 +151,16 @@ export const defaultCharacterState: CharacterState = {
 
 /* ── Store with temporal middleware (undo/redo) ── */
 
+/* ── Create store with persistence ── */
+
+// Pre-load saved state so we hydrate before React renders
+const _savedState = typeof window !== "undefined" ? loadSavedState() : {};
+
 export const useCharacterStore = create<CharacterState & CharacterActions>()(
   temporal(
     (set, get) => ({
       ...defaultCharacterState,
+      ..._savedState,
 
       setName: (name) => set({ charName: name }),
       setGender: (gender) => set({ gender }),
@@ -278,4 +303,42 @@ export function redo() {
 
 export function clearHistory() {
   getTemporalState().clear();
+}
+
+/* ── Auto-save subscription ── */
+
+let _persistInitialized = false;
+
+/**
+ * Subscribe to store changes and persist to localStorage.
+ * Called once from EditorLayout on mount.
+ */
+export function initPersistence(): void {
+  if (_persistInitialized) return;
+  _persistInitialized = true;
+
+  useCharacterStore.subscribe((state) => {
+    try {
+      const {
+        charName, gender, bodyType, categoryId, templateId,
+        height, width, headSize, limbProportions,
+        leftRightVariation, partVisibility,
+        eyeSize, expression, skinTone,
+        hairStyle, hairColor,
+        outfit, outfitColors,
+        accessories, background, backgroundMode,
+      } = state;
+      localStorage.setItem(PERSIST_KEY, JSON.stringify({
+        charName, gender, bodyType, categoryId, templateId,
+        height, width, headSize, limbProportions,
+        leftRightVariation, partVisibility,
+        eyeSize, expression, skinTone,
+        hairStyle, hairColor,
+        outfit, outfitColors,
+        accessories, background, backgroundMode,
+      }));
+    } catch {
+      // Storage full or blocked — silently skip
+    }
+  });
 }
