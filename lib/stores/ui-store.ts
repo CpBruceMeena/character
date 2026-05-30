@@ -2,18 +2,11 @@ import { create } from "zustand";
 
 export type ControlSection = "identity" | "body" | "face" | "hair" | "clothing" | "accessories" | "background";
 
-export interface Toast {
-  id: string;
-  type: "success" | "error" | "info";
-  message: string;
-}
-
 export interface UIState {
   activeControlSection: ControlSection;
   isExportDialogOpen: boolean;
   isCategorySidebarOpen: boolean;
   isControlPanelOpen: boolean;
-  toasts: Toast[];
   // Canvas viewport
   canvasZoom: number;
   canvasPanX: number;
@@ -26,21 +19,17 @@ export interface UIActions {
   setExportDialogOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   toggleControlPanel: () => void;
-  addToast: (toast: Omit<Toast, "id">) => void;
-  dismissToast: (id: string) => void;
   setCanvasZoom: (zoom: number) => void;
   setCanvasPan: (x: number, y: number) => void;
   resetCanvasView: () => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility
-  (set, _get) => ({
+  (set) => ({
   activeControlSection: "body",
   isExportDialogOpen: false,
   isCategorySidebarOpen: true,
   isControlPanelOpen: true,
-  toasts: [],
   canvasZoom: 100,
   canvasPanX: 0,
   canvasPanY: 0,
@@ -54,19 +43,6 @@ export const useUIStore = create<UIState & UIActions>()(
 
   toggleControlPanel: () =>
     set((s) => ({ isControlPanelOpen: !s.isControlPanelOpen })),
-
-  addToast: (toast) =>
-    set((s) => ({
-      toasts: [
-        ...s.toasts,
-        { ...toast, id: `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}` },
-      ],
-    })),
-
-  dismissToast: (id) =>
-    set((s) => ({
-      toasts: s.toasts.filter((t) => t.id !== id),
-    })),
 
   setCanvasZoom: (canvasZoom) => set({ canvasZoom }),
   setCanvasPan: (canvasPanX, canvasPanY) => set({ canvasPanX, canvasPanY }),

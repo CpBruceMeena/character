@@ -88,30 +88,6 @@
   }
 }
 
-/* ── Toast slide-in keyframe ── */
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── Toast slide-out keyframe ── */
-@keyframes slide-up {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-}
-
 /* ── Checkmark draw animation ── */
 @keyframes check-draw {
   to {
