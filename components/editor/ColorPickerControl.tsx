@@ -18,14 +18,12 @@ const SWATCHES = [
 
 export function ColorPickerControl({
   label,
-  value: initialValue = "#D4A574",
+  value = "#D4A574",
   onChange,
 }: ColorPickerControlProps) {
-  const [value, setValue] = useState(initialValue);
   const [showPicker, setShowPicker] = useState(false);
 
   const handleColorChange = (color: string) => {
-    setValue(color);
     onChange?.(color);
   };
 

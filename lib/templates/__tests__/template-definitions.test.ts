@@ -4,28 +4,36 @@ import { getFullRegistry, getCategories, getTemplate, getTemplatesForCategory } 
 
 // Import all template side effects to register them at module load time
 import "../definitions/cartoon-base-a";
+import "../definitions/cartoon-pet";
 import "../definitions/fantasy-knight";
+import "../definitions/fantasy-elf";
 import "../definitions/sci-fi-armor";
+import "../definitions/sci-fi-cyborg";
 import "../definitions/steampunk-explorer";
 import "../definitions/modern-casual";
 import "../definitions/samurai";
+import "../definitions/victorian-gentleman";
 
 // Registry is populated synchronously by the side-effect imports above
 const registry = getFullRegistry();
 
-const TEMPLATE_IDS = ["cartoon-base-a", "fantasy-knight", "sci-fi-armor", "steampunk-explorer", "modern-casual", "samurai"];
+const TEMPLATE_IDS = ["cartoon-base-a", "cartoon-pet", "fantasy-knight", "fantasy-elf", "sci-fi-armor", "sci-fi-cyborg", "steampunk-explorer", "modern-casual", "samurai", "victorian-gentleman"];
 
 const EXPECTED_META: Record<string, { category: CategoryId; name: string }> = {
   "cartoon-base-a": { category: "cartoon", name: "Base A" },
+  "cartoon-pet": { category: "cartoon", name: "Pet" },
   "fantasy-knight": { category: "fantasy", name: "Knight" },
+  "fantasy-elf": { category: "fantasy", name: "Elf Archer" },
   "sci-fi-armor": { category: "sci-fi", name: "Space Armor" },
+  "sci-fi-cyborg": { category: "sci-fi", name: "Cyborg" },
   "steampunk-explorer": { category: "modern", name: "Steampunk Explorer" },
   "modern-casual": { category: "modern", name: "Street Style" },
   "samurai": { category: "historical", name: "Samurai" },
+  "victorian-gentleman": { category: "historical", name: "Victorian Gentleman" },
 };
 
 describe("Template Registry", () => {
-  it("registers all 6 templates", () => {
+  it("registers all 10 templates", () => {
     expect(Object.keys(registry.templates).sort()).toEqual([...TEMPLATE_IDS].sort());
   });
 
@@ -34,39 +42,51 @@ describe("Template Registry", () => {
   });
 
   it("maps each category to correct template IDs", () => {
-    const cat = getCategories().find((c) => c.id === "cartoon");
-    expect(cat?.templateIds).toContain("cartoon-base-a");
+    const cartoon = getCategories().find((c) => c.id === "cartoon");
+    expect(cartoon?.templateIds).toContain("cartoon-base-a");
+    expect(cartoon?.templateIds).toContain("cartoon-pet");
 
     const fantasy = getCategories().find((c) => c.id === "fantasy");
     expect(fantasy?.templateIds).toContain("fantasy-knight");
+    expect(fantasy?.templateIds).toContain("fantasy-elf");
 
     const scifi = getCategories().find((c) => c.id === "sci-fi");
     expect(scifi?.templateIds).toContain("sci-fi-armor");
+    expect(scifi?.templateIds).toContain("sci-fi-cyborg");
 
     const modern = getCategories().find((c) => c.id === "modern");
-    expect(modern?.templateIds).toContain("steampunk-explorer");
     expect(modern?.templateIds).toContain("modern-casual");
+    expect(modern?.templateIds).not.toContain("steampunk-explorer");
 
     const historical = getCategories().find((c) => c.id === "historical");
+    expect(historical?.templateIds).toContain("steampunk-explorer");
     expect(historical?.templateIds).toContain("samurai");
+    expect(historical?.templateIds).toContain("victorian-gentleman");
   });
 
   it("returns templates for each category", () => {
     const cartoonTemplates = getTemplatesForCategory("cartoon");
-    expect(cartoonTemplates).toHaveLength(1);
+    expect(cartoonTemplates).toHaveLength(2);
     expect(cartoonTemplates[0].id).toBe("cartoon-base-a");
+    expect(cartoonTemplates[1].id).toBe("cartoon-pet");
+
+    const fantasyTemplates = getTemplatesForCategory("fantasy");
+    expect(fantasyTemplates).toHaveLength(2);
 
     const modernTemplates = getTemplatesForCategory("modern");
-    expect(modernTemplates).toHaveLength(2);
+    expect(modernTemplates).toHaveLength(1);
+    expect(modernTemplates[0].id).toBe("modern-casual");
 
     const historicalTemplates = getTemplatesForCategory("historical");
-    expect(historicalTemplates).toHaveLength(1);
-    expect(historicalTemplates[0].id).toBe("samurai");
+    expect(historicalTemplates).toHaveLength(3);
+    expect(historicalTemplates[0].id).toBe("steampunk-explorer");
+    expect(historicalTemplates[1].id).toBe("samurai");
+    expect(historicalTemplates[2].id).toBe("victorian-gentleman");
   });
 
-  it("returns all 6 templates from getAllTemplates if available", () => {
+  it("returns all 10 templates from getAllTemplates if available", () => {
     const all = Object.values(registry.templates);
-    expect(all).toHaveLength(6);
+    expect(all).toHaveLength(10);
   });
 
   it("getTemplate returns correct template by ID", () => {

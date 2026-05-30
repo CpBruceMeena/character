@@ -89,17 +89,13 @@ export function useTheme() {
 }
 
 /**
- * Initialize theme on page load (run once in root layout).
- * Reads stored preference or system preference and applies `.dark` class
- * before first paint to avoid flash of wrong theme.
+ * Self-contained inline script for the root layout `<head>`.
+ * This is a plain string — NOT a function — because it runs as an inline
+ * `<script>` before any JS module code loads. Everything is inlined to
+ * avoid referencing module-scoped symbols (getResolvedTheme, STORAGE_KEY, etc.)
+ * that won't exist in the script's execution context.
+ *
+ * Reads the persisted theme from localStorage (or system preference), applies
+ * the `.dark` class to `<html>` before first paint to prevent FOUC.
  */
-export function initTheme(): void {
-  if (typeof window === "undefined") return;
-  const theme = getResolvedTheme();
-  try {
-    localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    // localStorage unavailable
-  }
-  applyTheme(theme);
-}
+export const THEME_INLINE_SCRIPT = `(function(){try{var k="cforge-theme",t=localStorage.getItem(k);if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";localStorage.setItem(k,t)}document.documentElement.classList.toggle("dark",t==="dark")}catch(e){}})()`;

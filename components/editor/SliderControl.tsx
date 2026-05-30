@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface SliderControlProps {
   label: string;
   value?: number;
@@ -13,17 +11,14 @@ interface SliderControlProps {
 
 export function SliderControl({
   label,
-  value: initialValue = 50,
+  value = 50,
   min = 0,
   max = 100,
   step = 1,
   onChange,
 }: SliderControlProps) {
-  const [value, setValue] = useState(initialValue);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = Number(e.target.value);
-    setValue(v);
     onChange?.(v);
   };
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface SelectControlProps {
   label: string;
   value?: string;
@@ -11,15 +9,12 @@ interface SelectControlProps {
 
 export function SelectControl({
   label,
-  value: initialValue,
+  value = "",
   options,
   onChange,
 }: SelectControlProps) {
-  const [value, setValue] = useState(initialValue ?? options[0]?.value ?? "");
-
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
-    setValue(v);
     onChange?.(v);
   };
 

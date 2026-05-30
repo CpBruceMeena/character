@@ -9,7 +9,7 @@ import { CanvasControls } from "@/components/canvas/CanvasControls";
 import { CacheDevTools } from "@/components/debug/CacheDevTools";
 import { ControlPanel } from "./ControlPanel";
 import { ExportDialog } from "./ExportDialog";
-import { useCharacterStore } from "@/lib/stores/character-store";
+import { useCharacterStore, hydrateFromStorage } from "@/lib/stores/character-store";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { getCategories, getTemplatesForCategory } from "@/lib/templates/registry";
 import { useOnboarding } from "@/lib/utils/use-onboarding";
@@ -20,16 +20,20 @@ import type { CategoryId } from "@/lib/templates/schema";
 
 // Static imports ensure template definitions are registered at module load
 import "@/lib/templates/definitions/cartoon-base-a";
+import "@/lib/templates/definitions/cartoon-pet";
 import "@/lib/templates/definitions/fantasy-knight";
+import "@/lib/templates/definitions/fantasy-elf";
 import "@/lib/templates/definitions/sci-fi-armor";
+import "@/lib/templates/definitions/sci-fi-cyborg";
 import "@/lib/templates/definitions/steampunk-explorer";
 import "@/lib/templates/definitions/modern-casual";
+import "@/lib/templates/definitions/victorian-gentleman";
 
 // Init persistence on the client
 import { initPersistence } from "@/lib/stores/character-store";
 
 function OnboardingOverlay() {
-  const { isActive, currentStep, step, totalSteps, next, dismiss, hydrated } =
+  const { isActive, currentStep, step, totalSteps, next, dismiss } =
     useOnboarding();
 
   if (!isActive || !currentStep || step === null) return null;
@@ -46,8 +50,11 @@ function OnboardingOverlay() {
 }
 
 export function EditorLayout() {
-  // Initialize state persistence once on mount
-  useEffect(() => { initPersistence(); }, []);
+  // Initialize — hydrate from localStorage then subscribe to persistent saves
+  useEffect(() => {
+    hydrateFromStorage();
+    initPersistence();
+  }, []);
 
   const searchParams = useSearchParams();
 
@@ -71,6 +78,7 @@ export function EditorLayout() {
         templateId: templateParam,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only: reads URL once on page load
   }, []); // only on mount
 
   const isSidebarOpen = useUIStore((s) => s.isCategorySidebarOpen);
@@ -117,7 +125,7 @@ export function EditorLayout() {
       ? selectedTemplate
       : templates.length > 0
         ? templates[0].id
-        : "base-a";
+        : "cartoon-base-a";
 
   return (
     <ErrorBoundary name="EditorLayout">

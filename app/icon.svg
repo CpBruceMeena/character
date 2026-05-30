@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="head" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#f59e0b"/>
+      <stop offset="100%" stopColor="#d97706"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#fbbf24"/>
+      <stop offset="100%" stopColor="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- Head -->
+  <circle cx="64" cy="44" r="26" fill="url(#head)"/>
+  <!-- Body -->
+  <path d="M34 90c0-16.5 13.4-30 30-30s30 13.5 30 30v18H34V90z" fill="url(#body)"/>
+  <!-- Eyes -->
+  <circle cx="54" cy="40" r="3" fill="#1a1614"/>
+  <circle cx="74" cy="40" r="3" fill="#1a1614"/>
+  <!-- Smile -->
+  <path d="M54 52c3 4 9 5 14 2" stroke="#1a1614" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+  <!-- Sparkle/crown -->
+  <path d="M48 22l4 8 10-5-5 9 10 5-10 4 3 10-9-5-3 10-5-9-10 4 5-9-10-5 9-5-4-9z" fill="#fbbf24" opacity="0.8"/>
+</svg>

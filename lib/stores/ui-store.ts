@@ -33,7 +33,9 @@ export interface UIActions {
   resetCanvasView: () => void;
 }
 
-export const useUIStore = create<UIState & UIActions>()((set, get) => ({
+export const useUIStore = create<UIState & UIActions>()(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility
+  (set, _get) => ({
   activeControlSection: "body",
   isExportDialogOpen: false,
   isCategorySidebarOpen: true,

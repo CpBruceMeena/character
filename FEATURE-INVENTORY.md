@@ -347,7 +347,7 @@
 | 5.7.1 | Steampunk Explorer | ✅ **New** | Modern category, explorer aesthetic |
 | 5.7.2 | Modern Casual | ✅ **New** | Modern category, street-style |
 | 5.7.3 | Samurai | ✅ **New** | Historical category, 21 layers, 19 controls, 6 color zones |
-| 5.7.4 | Victorian Gentleman | ❌ Planned | Historical category |
+| 5.7.4 | Victorian Gentleman | ✅ **New** | Historical category, 22 layers, 20 controls, 17 color zones |
 | 5.7.5 | More cartoon variants | ❌ Planned | Different body types, styles |
 | 5.7.6 | More fantasy variants | ❌ Planned | Mage, archer, rogue types |
 
@@ -406,7 +406,7 @@
 | 9.9 | `.claude/skills/gstack/` | ✅ Implemented | Vendored gstack skills |
 | 9.10 | `pnpm` package manager | ✅ Implemented | pnpm-lock.yaml present |
 | 9.11 | Vitest configuration | ✅ **New** | vitest.config.ts + vitest.setup.ts |
-| 9.12 | ESLint | ❌ Not configured | No ESLint config found |
+| 9.12 | ESLint | ✅ **New** | Flat config (eslint.config.mjs) with eslint-config-next/core-web-vitals + typescript. Zero errors, zero warnings. |
 | 9.13 | CI/CD pipeline | ❌ Missing | No GitHub Actions or similar |
 
 ---
@@ -443,13 +443,13 @@
 | Editor | 32 | 1 | 0 | 33 |
 | Canvas & Rendering | 18 | 0 | 3 | 21 |
 | State Management | 22 | 0 | 0 | 22 |
-| Template System | 32 | 0 | 4 | 36 |
+| Template System | 33 | 0 | 3 | 36 |
 | Shared Components | 7 | 0 | 0 | 7 |
 | Debug Tools | 1 | 1 | 0 | 2 |
 | Testing | 7 | 0 | 2 | 9 |
-| Infrastructure | 11 | 0 | 2 | 13 |
+| Infrastructure | 12 | 0 | 1 | 13 |
 | Planned/Future | 0 | 0 | 17 | 17 |
-| **Total** | **148** | **2** | **31** | **181** |
+| **Total** | **150** | **2** | **29** | **181** |
 
 > **Legend:**
 > - ✅ Implemented — working in current codebase

@@ -109,7 +109,7 @@ export const defaultCharacterState: CharacterState = {
   bodyType: "athletic",
 
   categoryId: "cartoon",
-  templateId: "base-a",
+  templateId: "cartoon-base-a",
 
   height: 55,
   width: 50,
@@ -153,14 +153,15 @@ export const defaultCharacterState: CharacterState = {
 
 /* ── Create store with persistence ── */
 
-// Pre-load saved state so we hydrate before React renders
-const _savedState = typeof window !== "undefined" ? loadSavedState() : {};
-
+// Note: We intentionally do NOT hydrate from localStorage at module init time.
+// Doing so would cause hydration errors because SSR always gets default state
+// (no localStorage on server) while the client module would load persisted data.
+// Instead, hydrateFromStorage() is called in a useEffect on the client.
 export const useCharacterStore = create<CharacterState & CharacterActions>()(
   temporal(
-    (set, get) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility with temporal middleware
+    (set, _get) => ({
       ...defaultCharacterState,
-      ..._savedState,
 
       setName: (name) => set({ charName: name }),
       setGender: (gender) => set({ gender }),
@@ -290,7 +291,7 @@ export type CharacterTemporalState = TemporalState<Partial<CharacterState>>;
 
 // Hook to get temporal store state + helpers for reactive components
 export function getTemporalState(): CharacterTemporalState {
-  return (useCharacterStore as any).temporal.getState() as CharacterTemporalState;
+  return useCharacterStore.temporal.getState() as CharacterTemporalState;
 }
 
 export function undo() {
@@ -303,6 +304,20 @@ export function redo() {
 
 export function clearHistory() {
   getTemporalState().clear();
+}
+
+/* ── Hydrate from localStorage (client-only) ── */
+
+/**
+ * Load persisted state from localStorage and apply it to the store.
+ * Safe to call multiple times (ignores empty/failed reads).
+ * Called once from EditorLayout's useEffect on mount.
+ */
+export function hydrateFromStorage(): void {
+  const saved = loadSavedState();
+  if (Object.keys(saved).length > 0) {
+    useCharacterStore.setState(saved);
+  }
 }
 
 /* ── Auto-save subscription ── */

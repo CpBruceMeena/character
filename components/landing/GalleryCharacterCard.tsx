@@ -7,10 +7,15 @@ import type { GalleryExample } from "@/lib/gallery/examples";
 
 // Import template definitions so registry is populated
 import "@/lib/templates/definitions/cartoon-base-a";
+import "@/lib/templates/definitions/cartoon-pet";
 import "@/lib/templates/definitions/fantasy-knight";
+import "@/lib/templates/definitions/fantasy-elf";
 import "@/lib/templates/definitions/sci-fi-armor";
+import "@/lib/templates/definitions/sci-fi-cyborg";
 import "@/lib/templates/definitions/steampunk-explorer";
 import "@/lib/templates/definitions/modern-casual";
+import "@/lib/templates/definitions/victorian-gentleman";
+import "@/lib/templates/definitions/samurai";
 
 interface GalleryCharacterCardProps {
   example: GalleryExample;
@@ -37,6 +42,7 @@ function CardSkeleton() {
 export function GalleryCharacterCard({ example }: GalleryCharacterCardProps) {
   const [svg, setSvg] = useState<string | null>(null);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional cascading state for async SVG composition */
   useEffect(() => {
     const template = getTemplate(example.templateId);
     if (!template) {
@@ -46,6 +52,7 @@ export function GalleryCharacterCard({ example }: GalleryCharacterCardProps) {
     const result = composeCharacterSvg(template, example.state);
     setSvg(result);
   }, [example]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // During SSR and before hydration (svg is null), show a skeleton
   if (svg === null) {

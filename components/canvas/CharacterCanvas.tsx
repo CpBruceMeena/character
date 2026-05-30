@@ -8,6 +8,27 @@ import { getTemplate } from "@/lib/templates/registry";
 import { renderCharacter, drawBackground } from "@/lib/canvas/renderer";
 import { clearLayerCache } from "@/lib/canvas/render-cache";
 import { CacheIndicator } from "@/components/canvas/CacheIndicator";
+import type { ControlSection } from "@/lib/stores/ui-store";
+
+/* ── Click-to-edit mapping ──
+ * Maps approximate y-regions of the character to control sections.
+ * clickY ranges from -1 (top of character) to 1 (bottom).
+ */
+function regionForClick(
+  clickY: number,
+): ControlSection {
+  // Top: head/face/hair region
+  if (clickY < -0.15) {
+    // Sub-region: above eyes = hair, eye level = face, below = identity
+    if (clickY < -0.5) return "hair";
+    if (clickY < -0.3) return "face";
+    return "identity";
+  }
+  // Middle: torso/clothing region
+  if (clickY < 0.3) return "clothing";
+  // Bottom: accessories/legs region
+  return "accessories";
+}
 
 interface CharacterCanvasProps {
   categoryId: string;
@@ -113,6 +134,10 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
     panX: 0,
     panY: 0,
   });
+  // Use a ref (not state) for drag detection so onClick can reliably check it
+  // before React batches the state reset from mouseUp.
+  const didDragRef = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Zoom/pan from UI store
   const canvasZoom = useUIStore((s) => s.canvasZoom);
@@ -215,11 +240,44 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
     [canvasZoom, setCanvasZoom],
   );
 
+  // ── Click-on-canvas: clicking character selects corresponding tab ──
+  const setActiveTab = useUIStore((s) => s.setActiveControlSection);
+  const activeTab = useUIStore((s) => s.activeControlSection);
+
+  const handleCanvasClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Don't trigger if user was dragging (panning). Use ref to avoid
+      // React batching issues — state resets before click event fires.
+      if (didDragRef.current) {
+        didDragRef.current = false;
+        return;
+      }
+      const viewport = viewportRef.current;
+      if (!viewport) return;
+      const rect = viewport.getBoundingClientRect();
+      // Compute click position relative to viewport center (-1 to 1)
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+      // Only register clicks within the character area (not too far from center)
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 0.9) return; // too far — probably background
+      const section = regionForClick(dy);
+      // Only switch if different, to avoid unnecessary re-renders
+      if (section !== activeTab) {
+        setActiveTab(section);
+      }
+    },
+    [activeTab, setActiveTab],
+  );
+
   // ── Mouse drag handlers ──
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       // Only drag with left button
       if (e.button !== 0) return;
+      // Record starting position for drag detection
       dragRef.current = {
         active: true,
         startX: e.clientX,
@@ -234,15 +292,31 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
       if (!dragRef.current.active) return;
-      const dx = e.clientX - dragRef.current.startX;
-      const dy = e.clientY - dragRef.current.startY;
-      setCanvasPan(dragRef.current.panX + dx, dragRef.current.panY + dy);
+      const dx = Math.abs(e.clientX - dragRef.current.startX);
+      const dy = Math.abs(e.clientY - dragRef.current.startY);
+      // Only consider it dragging after moving 4+ pixels (debounce threshold)
+      if (dx > 4 || dy > 4) {
+        setIsDragging(true);
+        didDragRef.current = true;
+      }
+      if (!isDragging) return;
+      const deltaX = e.clientX - dragRef.current.startX;
+      const deltaY = e.clientY - dragRef.current.startY;
+      setCanvasPan(dragRef.current.panX + deltaX, dragRef.current.panY + deltaY);
     },
-    [setCanvasPan],
+    [isDragging, setCanvasPan],
   );
 
   const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
     dragRef.current.active = false;
+  }, []);
+
+  // ── Reset drag state on mouse leave ──
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+    dragRef.current.active = false;
+    didDragRef.current = false;
   }, []);
 
   // ── Double-click reset ──
@@ -261,12 +335,13 @@ export function CharacterCanvas({ categoryId, templateId }: CharacterCanvasProps
         {/* Viewport — handles zoom/pan transform */}
         <div
           ref={viewportRef}
-          className={`absolute inset-0 flex items-center justify-center ${dragRef.current.active ? "cursor-grabbing" : "cursor-grab"}`}
+          className={`absolute inset-0 flex items-center justify-center ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleCanvasClick}
           onDoubleClick={handleDoubleClick}
           style={{
             transform: `scale(${zoomPercent}) translate(${canvasPanX / zoomPercent}px, ${canvasPanY / zoomPercent}px)`,

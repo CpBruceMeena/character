@@ -39,7 +39,7 @@ const mockState: Record<string, unknown> = {
 
 function makeOptions(overrides?: Partial<ExportOptions>): ExportOptions {
   return {
-    template: mockTemplate as any,
+    template: mockTemplate as unknown as ExportOptions["template"],
     state: mockState,
     width: 120,
     height: 180,

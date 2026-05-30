@@ -1,4 +1,4 @@
-import { getCategory, getCategories, getTemplate, getTemplatesForCategory } from "./registry";
+import { getCategories, getTemplate, getTemplatesForCategory } from "./registry";
 import type { CategoryId, TemplateDefinition } from "./schema";
 
 /* ── Simple import-based preloader ── */
@@ -11,6 +11,7 @@ import type { CategoryId, TemplateDefinition } from "./schema";
  * In Phase 1 all templates are registered via static imports.
  * In Phase 2+ this can switch to dynamic `import()` for code splitting.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for future dynamic import support
 async function preloadCategoryTemplates(_categoryId: CategoryId): Promise<void> {
   // Static imports at the top of the file already handle registration.
   // This function exists as an extension point for dynamic loading later.

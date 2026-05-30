@@ -14,7 +14,7 @@ describe("URL sharing (store integration)", () => {
     expect(state.charName).toBe("My Character");
     expect(state.gender).toBe("masculine");
     expect(state.categoryId).toBe("cartoon");
-    expect(state.templateId).toBe("base-a");
+    expect(state.templateId).toBe("cartoon-base-a");
     expect(state.skinTone).toBe("#D4A574");
     expect(state.hairColor).toBe("#3D2314");
     expect(state.backgroundMode).toBe("checker");

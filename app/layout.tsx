@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, DM_Sans } from "next/font/google";
-import { initTheme } from "@/lib/utils/use-theme";
+import { THEME_INLINE_SCRIPT } from "@/lib/utils/use-theme";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: "CharacterForge Pro — Create Your Character",
   description:
     "Design and customize characters from any style or genre. Pick a template, tune every detail, see changes in real time, and export in any format.",
+  icons: [{ rel: "icon", url: "/icon.svg", type: "image/svg+xml" }],
   openGraph: {
     title: "CharacterForge Pro",
     description:
@@ -46,7 +47,7 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(${initTheme.toString()})()`,
+            __html: THEME_INLINE_SCRIPT,
           }}
         />
       </head>

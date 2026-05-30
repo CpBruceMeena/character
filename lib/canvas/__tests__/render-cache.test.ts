@@ -106,7 +106,6 @@ describe("render-cache", () => {
     it("evicts oldest entries when cache exceeds max size", () => {
       // The cache maxes out at 32 entries. Fill it with 33.
       const state33: Record<string, unknown> = { outfitColors: { primary: "#4A6FA5" } };
-      const stateFF: Record<string, unknown> = { outfitColors: { primary: "#FF0000" } };
 
       for (let i = 0; i < 32; i++) {
         const c = makeCanvas();

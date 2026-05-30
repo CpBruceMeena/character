@@ -6,6 +6,7 @@ crg-cache/
 .cache/crg/
 *.crg
 .gstack/
+~
 
 # Dependencies
 node_modules/

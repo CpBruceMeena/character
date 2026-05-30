@@ -157,8 +157,6 @@ describe("ExportDialog", () => {
 
   it("closes when Cancel is clicked", async () => {
     openDialog();
-    const closeSpy = vi.fn();
-    // Override the close action
     useUIStore.setState({ isExportDialogOpen: true });
 
     const ExportDialog = await loadExportDialog();

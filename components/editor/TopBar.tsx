@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/shared/Button";
 import { IconButton } from "@/components/shared/IconButton";
 import { ThemeToggle } from "./ThemeToggle";
@@ -44,7 +45,7 @@ export function TopBar({
       setCanRedo(ts.futureStates.length > 0);
     };
     update();
-    const unsub = (useCharacterStore as any).temporal.subscribe(update);
+    const unsub = useCharacterStore.temporal.subscribe(update);
     return unsub;
   }, []);
 
@@ -53,12 +54,12 @@ export function TopBar({
       <div className="flex items-center justify-between gap-2">
         {/* Left: logo + toggle buttons */}
         <div className="flex items-center gap-2">
-          <a
+          <Link
             href="/"
             className="hidden font-[family-name:var(--font-display-fredoka)] text-base font-semibold text-amber-700 sm:inline"
           >
             CharacterForge Pro
-          </a>
+          </Link>
 
           {/* Sidebar toggle */}
           <IconButton

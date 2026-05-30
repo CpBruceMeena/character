@@ -3,7 +3,7 @@
 import { useTheme } from "@/lib/utils/use-theme";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   return (
     <button

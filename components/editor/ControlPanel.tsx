@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { ControlSection } from "./ControlSection";
 import { SliderControl } from "./SliderControl";
 import { ColorPickerControl } from "./ColorPickerControl";
@@ -7,6 +8,8 @@ import { ToggleControl } from "./ToggleControl";
 import { SelectControl } from "./SelectControl";
 import { useCharacterStore } from "@/lib/stores/character-store";
 import { useUIStore, type ControlSection as ControlSectionType } from "@/lib/stores/ui-store";
+import { getTemplate } from "@/lib/templates/registry";
+import type { ControlDefinition } from "@/lib/templates/schema";
 
 interface Tab {
   id: ControlSectionType;
@@ -56,11 +59,160 @@ interface ControlPanelProps {
   isOpen: boolean;
 }
 
+/* ── Helper: render a single template control ── */
+
+interface ControlRendererProps {
+  control: ControlDefinition;
+}
+
+/** Map control types to appropriate store actions */
+function useControlDispatch(control: ControlDefinition) {
+  const toggleAccessory = useCharacterStore((s) => s.toggleAccessory);
+  const setOutfitColor = useCharacterStore((s) => s.setOutfitColor);
+  const setGender = useCharacterStore((s) => s.setGender);
+  const setBodyType = useCharacterStore((s) => s.setBodyType);
+  const setHeight = useCharacterStore((s) => s.setHeight);
+  const setWidth = useCharacterStore((s) => s.setWidth);
+  const setHeadSize = useCharacterStore((s) => s.setHeadSize);
+  const setLimbProportions = useCharacterStore((s) => s.setLimbProportions);
+  const setEyeSize = useCharacterStore((s) => s.setEyeSize);
+  const setExpression = useCharacterStore((s) => s.setExpression);
+  const setSkinTone = useCharacterStore((s) => s.setSkinTone);
+  const setHairStyle = useCharacterStore((s) => s.setHairStyle);
+  const setHairColor = useCharacterStore((s) => s.setHairColor);
+  const setOutfit = useCharacterStore((s) => s.setOutfit);
+
+  return useMemo(() => {
+    const path = control.targets[0];
+
+    if (control.type === "toggle") {
+      return {
+        value: undefined,
+        onChange: () => toggleAccessory(path),
+      };
+    }
+
+    if (path.startsWith("outfitColors.")) {
+      const zone = path.split(".")[1];
+      return {
+        value: undefined, // resolved by parent
+        onChange: (v: string) => setOutfitColor(zone, v),
+      };
+    }
+
+    // Map store property paths to setter actions
+    switch (path) {
+      case "gender": return { value: undefined, onChange: (v: string) => setGender(v as "masculine" | "feminine" | "androgynous") };
+      case "bodyType": return { value: undefined, onChange: (v: string) => setBodyType(v as string) };
+      case "height": return { value: undefined, onChange: (v: number) => setHeight(v) };
+      case "width": return { value: undefined, onChange: (v: number) => setWidth(v) };
+      case "headSize": return { value: undefined, onChange: (v: number) => setHeadSize(v) };
+      case "limbProportions": return { value: undefined, onChange: (v: number) => setLimbProportions(v) };
+      case "eyeSize": return { value: undefined, onChange: (v: number) => setEyeSize(v) };
+      case "expression": return { value: undefined, onChange: (v: string) => setExpression(v) };
+      case "skinTone": return { value: undefined, onChange: (v: string) => setSkinTone(v) };
+      case "hairStyle": return { value: undefined, onChange: (v: string) => setHairStyle(v) };
+      case "hairColor": return { value: undefined, onChange: (v: string) => setHairColor(v) };
+      case "outfit": return { value: undefined, onChange: (v: string) => setOutfit(v) };
+      default: return { value: undefined, onChange: () => {} };
+    }
+  }, [control, toggleAccessory, setOutfitColor, setGender, setBodyType, setHeight, setWidth, setHeadSize, setLimbProportions, setEyeSize, setExpression, setSkinTone, setHairStyle, setHairColor, setOutfit]);
+}
+
+function ControlRenderer({ control }: ControlRendererProps) {
+  const store = useCharacterStore();
+  const { onChange } = useControlDispatch(control);
+
+  // Resolve the current value from the store based on the control's primary target
+  const path = control.targets[0];
+  let value: unknown;
+
+  if (control.type === "toggle") {
+    value = store.accessories.toggles[path] ?? false;
+  } else if (path.startsWith("outfitColors.")) {
+    const zone = path.split(".")[1];
+    value = (store.outfitColors as Record<string, string>)[zone] ?? "#000000";
+  } else {
+    // Resolve dot-path from store (e.g., "outfitColors.primary")
+    const parts = path.split(".");
+    let v: unknown = store as unknown as Record<string, unknown>;
+    for (const p of parts) {
+      if (v === null || typeof v !== "object") { v = undefined; break; }
+      v = (v as Record<string, unknown>)[p];
+    }
+    value = v;
+  }
+
+  switch (control.type) {
+    case "slider":
+      return (
+        <SliderControl
+          label={control.label}
+          value={(value as number) ?? control.defaultValue as number ?? 50}
+          min={control.min ?? 0}
+          max={control.max ?? 100}
+          step={control.step ?? 1}
+          onChange={onChange as (v: number) => void}
+        />
+      );
+
+    case "select":
+      return (
+        <SelectControl
+          label={control.label}
+          value={(value as string) ?? control.defaultValue as string ?? ""}
+          options={control.options ?? []}
+          onChange={onChange as (v: string) => void}
+        />
+      );
+
+    case "color":
+      return (
+        <ColorPickerControl
+          label={control.label}
+          value={(value as string) ?? control.defaultValue as string ?? "#D4A574"}
+          onChange={onChange as (v: string) => void}
+        />
+      );
+
+    case "toggle":
+      return (
+        <ToggleControl
+          label={control.label}
+          checked={(value as boolean) ?? (control.defaultValue as boolean) ?? false}
+          onChange={onChange as unknown as (v: boolean) => void}
+        />
+      );
+
+    default:
+      return null;
+  }
+}
+
+/* ── Helper: group controls by a key function ── */
+
+function groupControls(
+  controls: ControlDefinition[],
+  groupBy: (c: ControlDefinition) => string,
+): Map<string, ControlDefinition[]> {
+  const groups = new Map<string, ControlDefinition[]>();
+  for (const c of controls) {
+    const key = groupBy(c);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(c);
+  }
+  return groups;
+}
+
+/* ── Main Component ── */
+
 export function ControlPanel({ isOpen }: ControlPanelProps) {
   const activeTab = useUIStore((s) => s.activeControlSection);
   const setActiveTab = useUIStore((s) => s.setActiveControlSection);
+  const templateId = useCharacterStore((s) => s.templateId);
+  const template = templateId ? getTemplate(templateId) : null;
 
-  // Character store selectors
+  // Universal store selectors (for universal controls like part visibility, background)
   const gender = useCharacterStore((s) => s.gender);
   const bodyType = useCharacterStore((s) => s.bodyType);
   const setGender = useCharacterStore((s) => s.setGender);
@@ -74,32 +226,55 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
   const setWidth = useCharacterStore((s) => s.setWidth);
   const setHeadSize = useCharacterStore((s) => s.setHeadSize);
   const setLimbProportions = useCharacterStore((s) => s.setLimbProportions);
+  const partVisibility = useCharacterStore((s) => s.partVisibility);
   const setPartVisibility = useCharacterStore((s) => s.setPartVisibility);
 
-  const eyeSize = useCharacterStore((s) => s.eyeSize);
-  const expression = useCharacterStore((s) => s.expression);
-  const skinTone = useCharacterStore((s) => s.skinTone);
-  const setEyeSize = useCharacterStore((s) => s.setEyeSize);
-  const setExpression = useCharacterStore((s) => s.setExpression);
-  const setSkinTone = useCharacterStore((s) => s.setSkinTone);
-
-  const hairStyle = useCharacterStore((s) => s.hairStyle);
-  const hairColor = useCharacterStore((s) => s.hairColor);
-  const setHairStyle = useCharacterStore((s) => s.setHairStyle);
-  const setHairColor = useCharacterStore((s) => s.setHairColor);
-
-  const outfit = useCharacterStore((s) => s.outfit);
-  const outfitColors = useCharacterStore((s) => s.outfitColors);
-  const setOutfit = useCharacterStore((s) => s.setOutfit);
-  const setOutfitColor = useCharacterStore((s) => s.setOutfitColor);
-
-  const toggleAccessory = useCharacterStore((s) => s.toggleAccessory);
-
-  // Background selectors
+  // Background selectors (universal)
   const background = useCharacterStore((s) => s.background);
   const backgroundMode = useCharacterStore((s) => s.backgroundMode);
   const setBackground = useCharacterStore((s) => s.setBackground);
   const setBackgroundMode = useCharacterStore((s) => s.setBackgroundMode);
+
+  // Render template controls with grouped sections
+  // excludeLabels: skip controls whose label matches universal controls already rendered in the tab
+  function renderTemplateControls(excludeLabels?: Set<string>) {
+    // Get raw controls for this section, excluding any that duplicate universal controls
+    const sectionControls = (
+      template?.controls.filter(
+        (c) => c.section === activeTab && (!excludeLabels || !excludeLabels.has(c.label))
+      ) ?? []
+    );
+    if (sectionControls.length === 0) {
+      return (
+        <div className="rounded-[10px] border border-dashed border-gray-300 p-4 text-center">
+          <p className="text-xs text-text-tertiary">
+            No specific options for this section in the current template.
+          </p>
+        </div>
+      );
+    }
+
+    // Re-group after filtering
+    const filteredGroups = groupControls(sectionControls, (c) => c.label);
+
+    const rendered: React.ReactNode[] = [];
+    filteredGroups.forEach((controls, groupName) => {
+      // If a group has exactly 1 control and its label matches the group name,
+      // render directly without redundant ControlSection wrapper
+      if (controls.length === 1 && controls[0].label === groupName) {
+        rendered.push(<ControlRenderer key={controls[0].id} control={controls[0]} />);
+      } else {
+        rendered.push(
+          <ControlSection key={groupName} title={groupName} defaultOpen>
+            {controls.map((c) => (
+              <ControlRenderer key={c.id} control={c} />
+            ))}
+          </ControlSection>,
+        );
+      }
+    });
+    return rendered;
+  }
 
   return (
     <aside
@@ -107,10 +282,10 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
         isOpen ? "w-[300px] min-w-[300px]" : "w-0 min-w-0 overflow-hidden"
       }`}
     >
-      {/* Tab bar */}
+      {/* Tab bar — scrollable for up to 7 tabs */}
       <nav
         data-onboarding-target="controls-tabs"
-        className="flex border-b border-border px-2 pt-2"
+        className="flex overflow-x-auto border-b border-border px-2 pt-2 scrollbar-none"
         role="tablist"
         aria-label="Character controls"
       >
@@ -124,7 +299,7 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
               aria-selected={isActive}
               aria-controls={`panel-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-t-[8px] px-1 py-2 text-[11px] font-medium transition-colors ${
+              className={`flex shrink-0 flex-col items-center gap-1 rounded-t-[8px] px-2.5 py-2 text-[11px] font-medium transition-colors ${
                 isActive
                   ? "bg-bg-page text-amber-700"
                   : "text-text-tertiary hover:bg-gray-50 hover:text-text-secondary"
@@ -139,7 +314,7 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d={tab.icon} />
               </svg>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="text-[10px] leading-tight">{tab.label}</span>
             </button>
           );
         })}
@@ -147,7 +322,7 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
 
       {/* Tab panels */}
       <div className="flex-1 overflow-y-auto p-3">
-        {/* Identity panel */}
+        {/* Identity panel — universal controls + template-specific */}
         {activeTab === "identity" && (
           <div role="tabpanel" id="panel-identity" aria-labelledby="tab-identity" className="space-y-4">
             <ControlSection title="Gender Presentation" defaultOpen>
@@ -176,10 +351,12 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
                 onChange={setBodyType as (v: string) => void}
               />
             </ControlSection>
+            {/* Template-specific identity controls (excluding universal Gender/Build) */}
+            {renderTemplateControls(new Set(["Gender", "Build"]))}
           </div>
         )}
 
-        {/* Body panel */}
+        {/* Body panel — universal proportions + template-specific */}
         {activeTab === "body" && (
           <div role="tabpanel" id="panel-body" aria-labelledby="tab-body" className="space-y-4">
             <ControlSection title="Proportions" defaultOpen>
@@ -189,110 +366,28 @@ export function ControlPanel({ isOpen }: ControlPanelProps) {
               <SliderControl label="Limb Proportion" value={limbProportions} min={0} max={100} onChange={setLimbProportions} />
             </ControlSection>
             <ControlSection title="Part Visibility">
-              <ToggleControl label="Head" defaultChecked onChange={(v) => setPartVisibility("head", v)} />
-              <ToggleControl label="Torso" defaultChecked onChange={(v) => setPartVisibility("torso", v)} />
-              <ToggleControl label="Arms" defaultChecked onChange={(v) => setPartVisibility("arms", v)} />
-              <ToggleControl label="Legs" defaultChecked onChange={(v) => setPartVisibility("legs", v)} />
+              <ToggleControl label="Head" checked={partVisibility["head"] ?? true} onChange={(v) => setPartVisibility("head", v)} />
+              <ToggleControl label="Torso" checked={partVisibility["torso"] ?? true} onChange={(v) => setPartVisibility("torso", v)} />
+              <ToggleControl label="Arms" checked={partVisibility["arms"] ?? true} onChange={(v) => setPartVisibility("arms", v)} />
+              <ToggleControl label="Legs" checked={partVisibility["legs"] ?? true} onChange={(v) => setPartVisibility("legs", v)} />
             </ControlSection>
+            {renderTemplateControls(new Set(["Height", "Width", "Head Size", "Limb Proportion", "Head", "Torso", "Arms", "Legs"]))}
           </div>
         )}
 
-        {/* Face panel */}
-        {activeTab === "face" && (
-          <div role="tabpanel" id="panel-face" aria-labelledby="tab-face" className="space-y-4">
-            <ControlSection title="Facial Features" defaultOpen>
-              <SliderControl label="Eye Size" value={eyeSize} min={20} max={100} onChange={setEyeSize} />
-              <SelectControl
-                label="Expression"
-                value={expression}
-                options={[
-                  { value: "neutral", label: "Neutral" },
-                  { value: "happy", label: "Happy" },
-                  { value: "serious", label: "Serious" },
-                  { value: "surprised", label: "Surprised" },
-                  { value: "sad", label: "Sad" },
-                ]}
-                onChange={setExpression}
-              />
-            </ControlSection>
-            <ControlSection title="Skin Tone">
-              <ColorPickerControl label="Skin Color" value={skinTone} onChange={setSkinTone} />
-            </ControlSection>
-          </div>
-        )}
+        {/* Face panel — template-specific */}
+        {activeTab === "face" && renderTemplateControls()}
 
-        {/* Hair panel */}
-        {activeTab === "hair" && (
-          <div role="tabpanel" id="panel-hair" aria-labelledby="tab-hair" className="space-y-4">
-            <ControlSection title="Hair Style" defaultOpen>
-              <SelectControl
-                label="Style"
-                value={hairStyle}
-                options={[
-                  { value: "short", label: "Short" },
-                  { value: "long", label: "Long" },
-                  { value: "curly", label: "Curly" },
-                  { value: "wavy", label: "Wavy" },
-                  { value: "bald", label: "Bald" },
-                  { value: "ponytail", label: "Ponytail" },
-                  { value: "bun", label: "Bun" },
-                ]}
-                onChange={setHairStyle}
-              />
-            </ControlSection>
-            <ControlSection title="Hair Color">
-              <ColorPickerControl label="Hair Color" value={hairColor} onChange={setHairColor} />
-            </ControlSection>
-          </div>
-        )}
+        {/* Hair panel — template-specific */}
+        {activeTab === "hair" && renderTemplateControls()}
 
-        {/* Clothing panel */}
-        {activeTab === "clothing" && (
-          <div role="tabpanel" id="panel-clothing" aria-labelledby="tab-clothing" className="space-y-4">
-            <ControlSection title="Outfit" defaultOpen>
-              <SelectControl
-                label="Style"
-                value={outfit}
-                options={[
-                  { value: "casual", label: "Casual" },
-                  { value: "formal", label: "Formal" },
-                  { value: "sporty", label: "Sporty" },
-                  { value: "armor", label: "Armor" },
-                  { value: "robe", label: "Robe" },
-                ]}
-                onChange={setOutfit}
-              />
-            </ControlSection>
-            <ControlSection title="Outfit Colors">
-              <ColorPickerControl label="Primary" value={outfitColors.primary} onChange={(c) => setOutfitColor("primary", c)} />
-              <ColorPickerControl label="Secondary" value={outfitColors.secondary} onChange={(c) => setOutfitColor("secondary", c)} />
-              <ColorPickerControl label="Accent" value={outfitColors.accent} onChange={(c) => setOutfitColor("accent", c)} />
-            </ControlSection>
-          </div>
-        )}
+        {/* Clothing panel — template-specific */}
+        {activeTab === "clothing" && renderTemplateControls()}
 
-        {/* Accessories panel */}
-        {activeTab === "accessories" && (
-          <div role="tabpanel" id="panel-accessories" aria-labelledby="tab-accessories" className="space-y-4">
-            <ControlSection title="Headwear" defaultOpen>
-              <ToggleControl label="Hat" onChange={() => toggleAccessory("hat")} />
-              <ToggleControl label="Crown" onChange={() => toggleAccessory("crown")} />
-              <ToggleControl label="Headband" onChange={() => toggleAccessory("headband")} />
-            </ControlSection>
-            <ControlSection title="Face">
-              <ToggleControl label="Glasses" onChange={() => toggleAccessory("glasses")} />
-              <ToggleControl label="Earrings" onChange={() => toggleAccessory("earrings")} />
-              <ToggleControl label="Mask" onChange={() => toggleAccessory("mask")} />
-            </ControlSection>
-            <ControlSection title="Extras">
-              <ToggleControl label="Scarf" onChange={() => toggleAccessory("scarf")} />
-              <ToggleControl label="Necklace" onChange={() => toggleAccessory("necklace")} />
-              <ToggleControl label="Backpack" onChange={() => toggleAccessory("backpack")} />
-            </ControlSection>
-          </div>
-        )}
+        {/* Accessories panel — template-specific */}
+        {activeTab === "accessories" && renderTemplateControls()}
 
-        {/* Background panel */}
+        {/* Background panel — universal */}
         {activeTab === "background" && (
           <div role="tabpanel" id="panel-background" aria-labelledby="tab-background" className="space-y-4">
             <ControlSection title="Background Style" defaultOpen>

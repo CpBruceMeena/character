@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useUIStore } from "@/lib/stores/ui-store";
-import { useCharacterStore } from "@/lib/stores/character-store";
+
+// Ensure base template definitions are registered (side-effect imports)
+import "@/lib/templates/definitions/cartoon-base-a";
 
 // Import after mocks are set up
 async function loadControlPanel() {
@@ -53,8 +55,8 @@ describe("ControlPanel", () => {
     const faceTab = screen.getByRole("tab", { name: /face/i });
     await userEvent.click(faceTab);
 
-    // Face content should now be visible
-    expect(screen.getByText("Facial Features")).toBeInTheDocument();
+    // Face content should now be visible — template-specific controls for base-a
+    expect(screen.getByText("Eye Size")).toBeInTheDocument();
     // Body content should be gone
     expect(screen.queryByText("Proportions")).not.toBeInTheDocument();
   });
@@ -84,8 +86,9 @@ describe("ControlPanel", () => {
     const ControlPanel = await loadControlPanel();
     render(<ControlPanel isOpen={true} />);
 
-    expect(screen.getByText("Facial Features")).toBeInTheDocument();
+    // Template-specific face controls for base-a
     expect(screen.getByText("Eye Size")).toBeInTheDocument();
+    expect(screen.getByText("Expression")).toBeInTheDocument();
   });
 
   it("renders background panel with type selector", async () => {
@@ -136,12 +139,12 @@ describe("ControlPanel", () => {
     const ControlPanel = await loadControlPanel();
     render(<ControlPanel isOpen={true} />);
 
-    expect(screen.getByText("Headwear")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /face/i })).toBeInTheDocument();
-    expect(screen.getByText("Extras")).toBeInTheDocument();
+    // Template-specific accessory toggles for base-a template
+    // Each accessory toggle has its own label
+    expect(screen.getByText("Backpack")).toBeInTheDocument();
 
-    // Only Headwear section has defaultOpen=true, so 3 toggles visible
+    // All accessory toggles should be rendered for base-a template
     const switches = screen.getAllByRole("switch");
-    expect(switches.length).toBe(3);
+    expect(switches.length).toBe(9); // 9 accessories: backpack, scarf, necklace, earrings, glasses, mask, headband, hat, crown
   });
 });

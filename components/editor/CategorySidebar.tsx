@@ -111,10 +111,7 @@ export function CategorySidebar({
           {categories.map((cat) => (
             <li key={cat.id}>
               <button
-                onClick={() => {
-                  onSelectCategory(cat.id);
-                  onSelectTemplate("base-a");
-                }}
+                onClick={() => onSelectCategory(cat.id)}
                 className={`flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left text-sm transition-colors ${
                   selectedCategory === cat.id
                     ? "bg-amber-100 font-medium text-amber-800"

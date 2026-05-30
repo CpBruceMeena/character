@@ -1,20 +1,14 @@
 "use client";
 
-import { useState } from "react";
-
 interface ToggleControlProps {
   label: string;
-  defaultChecked?: boolean;
+  checked?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
-export function ToggleControl({ label, defaultChecked = false, onChange }: ToggleControlProps) {
-  const [checked, setChecked] = useState(defaultChecked);
-
+export function ToggleControl({ label, checked = false, onChange }: ToggleControlProps) {
   const handleToggle = () => {
-    const next = !checked;
-    setChecked(next);
-    onChange?.(next);
+    onChange?.(!checked);
   };
 
   return (

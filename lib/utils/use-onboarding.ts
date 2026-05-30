@@ -73,11 +73,13 @@ export function useOnboarding() {
   });
   const [hydrated, setHydrated] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional cascading state for hydration tracking */
   useEffect(() => {
     const done = safeGetItem(STORAGE_KEY);
     setStep(done === "true" ? null : 0);
     setHydrated(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const next = useCallback(() => {
     setStep((prev) => {

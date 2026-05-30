@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useCharacterStore } from "@/lib/stores/character-store";
+import { useCharacterStore, type CharacterState } from "@/lib/stores/character-store";
 
 const PARAM_KEY = "c";
 
@@ -97,7 +97,7 @@ function hydrateFromUrl(): boolean {
   if (!decoded) return false;
 
   const store = useCharacterStore.getState();
-  if (decoded.gender) store.setGender(decoded.gender as any);
+  if (decoded.gender) store.setGender(decoded.gender as CharacterState["gender"]);
   if (decoded.bodyType) store.setBodyType(decoded.bodyType);
   if (decoded.categoryId !== undefined) store.selectCategory(decoded.categoryId ?? "cartoon");
   if (decoded.templateId !== undefined) store.selectTemplate(decoded.templateId ?? "");
@@ -115,7 +115,7 @@ function hydrateFromUrl(): boolean {
       store.setOutfitColor(zone, color);
     });
   }
-  if (decoded.backgroundMode) store.setBackgroundMode(decoded.backgroundMode as any);
+  if (decoded.backgroundMode) store.setBackgroundMode(decoded.backgroundMode as CharacterState["backgroundMode"]);
   return true;
 }
 

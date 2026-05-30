@@ -52,14 +52,11 @@ export function ExportDialog() {
   const isOpen = useUIStore((s) => s.isExportDialogOpen);
   const close = useUIStore((s) => s.setExportDialogOpen);
 
-  const charName = useCharacterStore((s) => s.charName);
-  const categoryId = useCharacterStore((s) => s.categoryId);
   const templateId = useCharacterStore((s) => s.templateId);
 
   // Format & scale state
   const [format, setFormat] = useState<ExportFormat>("png");
   const [scale, setScale] = useState<ScaleValue>(1);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>("fullbody");
 
   // Export progress
@@ -109,6 +106,7 @@ export function ExportDialog() {
   }, [activePreset, format]);
 
   // Render preview when dialog opens or format/preset/scale changes
+  // The cascading state updates are intentional — tracking async render progress
   useEffect(() => {
     if (!isOpen) return;
 
@@ -118,6 +116,7 @@ export function ExportDialog() {
     const template = getTemplate(templateId ?? "");
     if (!template) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional cascading state for async preview render tracking
     setPreviewLoaded(false);
 
     const state = useCharacterStore.getState();
