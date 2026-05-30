@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ── CharacterForge Pro Design System ────────────────────────────── */
-/* Source: DESIGN.md — warm amber + coral + teal palette             */
+/* Brand palette: warm amber (primary) + coral (action) + teal (secondary) */
 
 @theme inline {
   /* ── Brand: Amber ─── Warm, Inviting ── */
