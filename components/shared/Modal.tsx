@@ -76,7 +76,7 @@ function Modal({ isOpen, onClose, title, titleId, children }: ModalProps) {
         aria-modal="true"
         aria-labelledby={titleId ?? "modal-title"}
         tabIndex={-1}
-        className="w-full max-w-lg rounded-[24px] bg-bg-card p-6 shadow-lg outline-none"
+        className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-[24px] bg-bg-card p-6 shadow-lg outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">

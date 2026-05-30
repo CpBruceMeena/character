@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/shared/Button";
 import { IconButton } from "@/components/shared/IconButton";
-import { ThemeToggle } from "./ThemeToggle";
 import {
   useCharacterStore,
   undo,
@@ -142,8 +141,6 @@ export function TopBar({
 
         {/* Right: actions */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Theme toggle */}
-          <ThemeToggle />
           {/* Desktop action buttons */}
           <div data-onboarding-target="undo-redo" className="hidden items-center gap-1 sm:flex">
             <IconButton

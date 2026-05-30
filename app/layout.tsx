@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fredoka, DM_Sans } from "next/font/google";
-import { THEME_INLINE_SCRIPT } from "@/lib/utils/use-theme";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -44,11 +43,6 @@ export default function RootLayout({
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: THEME_INLINE_SCRIPT,
-          }}
         />
       </head>
       <body className="flex min-h-full flex-col">{children}</body>

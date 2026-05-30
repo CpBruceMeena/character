@@ -85,7 +85,6 @@ export function EditorLayout() {
   const isControlsOpen = useUIStore((s) => s.isControlPanelOpen);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const toggleControlPanel = useUIStore((s) => s.toggleControlPanel);
-
   // Derive data from template registry
   const categories = useMemo(() => getCategories(), []);
 
